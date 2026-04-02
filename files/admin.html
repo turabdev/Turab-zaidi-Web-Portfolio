@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ZAIDI — Admin CMS</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Orbitron:wght@700;900&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#080c14;
+  --bg2:#0d1220;
+  --bg3:#111828;
+  --panel:#0f1624;
+  --border:rgba(99,179,237,0.15);
+  --border2:rgba(99,179,237,0.25);
+  --accent:#63b3ed;
+  --accent2:#4299e1;
+  --green:#48bb78;
+  --red:#fc8181;
+  --yellow:#f6e05e;
+  --purple:#b794f4;
+  --pink:#f687b3;
+  --text:#e2e8f0;
+  --text2:#a0aec0;
+  --text3:#4a5568;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Syne',sans-serif;
+  --shadow:0 4px 24px rgba(0,0,0,0.4);
+}
+html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);overflow:hidden;}
+
+/* ── NOISE ── */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:9999;opacity:0.5;
+}
+
+/* ════════════════════
+   LOGIN SCREEN
+════════════════════ */
+#login-screen{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);z-index:500;
+  transition:opacity 0.5s ease,transform 0.5s ease;
+}
+#login-screen.out{opacity:0;transform:scale(1.06);pointer-events:none;}
+
+.login-wrap{
+  width:400px;
+  background:var(--panel);
+  border:1px solid var(--border2);
+  border-radius:16px;
+  padding:40px;
+  box-shadow:0 0 60px rgba(99,179,237,0.08), var(--shadow);
+  position:relative;overflow:hidden;
+}
+.login-wrap::before{
+  content:'';position:absolute;top:-80px;right:-80px;
+  width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle, rgba(99,179,237,0.08) 0%, transparent 70%);
+  pointer-events:none;
+}
+.login-logo{
+  display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:32px;
+}
+.login-logo-icon{
+  font-family:'Orbitron',monospace;font-size:22px;font-weight:900;
+  color:var(--accent);letter-spacing:4px;
+  text-shadow:0 0 20px rgba(99,179,237,0.4);
+}
+.login-logo-sub{font-size:10px;color:var(--text3);letter-spacing:3px;text-transform:uppercase;font-family:var(--mono);}
+.login-title{font-size:18px;font-weight:700;margin-bottom:6px;color:var(--text);}
+.login-sub{font-size:12px;color:var(--text2);margin-bottom:28px;font-family:var(--mono);}
+.login-field{margin-bottom:16px;}
+.login-label{font-size:10px;color:var(--text2);letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:6px;font-family:var(--mono);}
+.login-input{
+  width:100%;padding:11px 14px;border-radius:8px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  color:var(--text);font-family:var(--mono);font-size:13px;
+  outline:none;transition:border-color 0.2s,box-shadow 0.2s;
+}
+.login-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,179,237,0.12);}
+.login-btn{
+  width:100%;padding:12px;border:none;border-radius:8px;
+  background:linear-gradient(135deg,var(--accent2),var(--accent));
+  color:var(--bg);font-family:var(--mono);font-size:13px;font-weight:700;
+  cursor:pointer;letter-spacing:1px;margin-top:8px;
+  transition:opacity 0.2s,transform 0.2s;
+}
+.login-btn:hover{opacity:0.88;transform:translateY(-1px);}
+.login-error{
+  font-size:11px;color:var(--red);font-family:var(--mono);
+  text-align:center;margin-top:10px;display:none;letter-spacing:0.5px;
+}
+.login-hint{font-size:10px;color:var(--text3);text-align:center;margin-top:14px;font-family:var(--mono);}
+
+/* ════════════════════
+   DASHBOARD LAYOUT
+════════════════════ */
+#dashboard{display:none;height:100vh;flex-direction:column;}
+#dashboard.visible{display:flex;}
+
+/* Top nav */
+#topnav{
+  height:52px;background:var(--panel);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 20px;gap:16px;flex-shrink:0;
+  position:relative;z-index:100;
+}
+.nav-logo{
+  font-family:'Orbitron',monospace;font-size:13px;font-weight:900;
+  color:var(--accent);letter-spacing:3px;margin-right:8px;
+}
+.nav-slash{color:var(--text3);font-size:16px;font-family:var(--mono);}
+.nav-page{font-size:12px;color:var(--text2);font-family:var(--mono);letter-spacing:1px;}
+.nav-spacer{flex:1;}
+.nav-badge{
+  display:flex;align-items:center;gap:6px;
+  padding:5px 12px;border-radius:20px;
+  background:rgba(72,187,120,0.1);border:1px solid rgba(72,187,120,0.2);
+  font-size:10px;color:var(--green);font-family:var(--mono);letter-spacing:1px;
+}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.nav-logout{
+  padding:6px 14px;border-radius:6px;border:1px solid var(--border);
+  background:transparent;color:var(--text2);font-family:var(--mono);font-size:11px;
+  cursor:pointer;transition:border-color 0.2s,color 0.2s;letter-spacing:0.5px;
+}
+.nav-logout:hover{border-color:var(--red);color:var(--red);}
+
+/* Main layout */
+#main-layout{display:flex;flex:1;overflow:hidden;}
+
+/* Sidebar */
+#sidebar{
+  width:220px;background:var(--panel);border-right:1px solid var(--border);
+  padding:16px 0;flex-shrink:0;overflow-y:auto;
+}
+.sidebar-section{margin-bottom:8px;}
+.sidebar-label{
+  font-size:9px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;
+  padding:0 18px;margin-bottom:4px;font-family:var(--mono);
+}
+.sidebar-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 18px;cursor:pointer;font-size:13px;
+  transition:background 0.15s,color 0.15s;color:var(--text2);
+  border-left:2px solid transparent;
+}
+.sidebar-item:hover{background:rgba(99,179,237,0.06);color:var(--text);}
+.sidebar-item.active{
+  background:rgba(99,179,237,0.1);color:var(--accent);
+  border-left-color:var(--accent);
+}
+.sidebar-icon{font-size:15px;width:20px;text-align:center;}
+.sidebar-count{
+  margin-left:auto;font-size:9px;padding:2px 7px;border-radius:10px;
+  background:rgba(99,179,237,0.12);color:var(--accent);font-family:var(--mono);
+}
+.sidebar-sep{height:1px;background:var(--border);margin:10px 16px;}
+
+/* Content area */
+#content{flex:1;overflow-y:auto;padding:24px;background:var(--bg);}
+#content::-webkit-scrollbar{width:5px;}
+#content::-webkit-scrollbar-thumb{background:rgba(99,179,237,0.25);border-radius:3px;}
+
+/* ── DASHBOARD HOME ── */
+.dash-header{margin-bottom:24px;}
+.dash-title{font-size:22px;font-weight:800;color:var(--text);}
+.dash-sub{font-size:12px;color:var(--text2);margin-top:4px;font-family:var(--mono);}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.stat-card{
+  padding:18px;border-radius:10px;background:var(--panel);
+  border:1px solid var(--border);
+  transition:border-color 0.2s,transform 0.2s;cursor:default;
+}
+.stat-card:hover{border-color:var(--border2);transform:translateY(-2px);}
+.stat-card-icon{font-size:22px;margin-bottom:10px;}
+.stat-card-num{font-size:26px;font-weight:700;font-family:var(--mono);}
+.stat-card-label{font-size:10px;color:var(--text2);letter-spacing:1.5px;text-transform:uppercase;margin-top:3px;}
+.quick-actions{margin-bottom:24px;}
+.qa-title{font-size:13px;font-weight:700;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+.qa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;}
+.qa-btn{
+  padding:12px 16px;border-radius:8px;border:1px solid var(--border);
+  background:var(--panel);cursor:pointer;text-align:left;
+  transition:border-color 0.2s,background 0.2s,transform 0.2s;
+  display:flex;align-items:center;gap:10px;
+}
+.qa-btn:hover{border-color:var(--border2);background:rgba(99,179,237,0.06);transform:translateY(-2px);}
+.qa-btn-icon{font-size:18px;}
+.qa-btn-text{font-size:12px;color:var(--text2);}
+
+/* ── CRUD TABLE ── */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.section-title{font-size:18px;font-weight:800;color:var(--text);}
+.btn-add{
+  padding:8px 18px;border-radius:6px;border:none;
+  background:linear-gradient(135deg,var(--accent2),var(--accent));
+  color:var(--bg);font-family:var(--mono);font-size:11px;font-weight:700;
+  cursor:pointer;letter-spacing:1px;transition:opacity 0.2s,transform 0.2s;
+}
+.btn-add:hover{opacity:0.88;transform:translateY(-1px);}
+.table-wrap{background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+thead{background:var(--bg2);}
+th{
+  padding:10px 14px;text-align:left;font-size:10px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);
+  font-family:var(--mono);border-bottom:1px solid var(--border);
+}
+td{
+  padding:12px 14px;font-size:12px;color:var(--text2);
+  border-bottom:1px solid rgba(99,179,237,0.06);
+  font-family:var(--mono);vertical-align:middle;
+}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(99,179,237,0.03);}
+.td-title{color:var(--text);font-weight:500;}
+.badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:9px;letter-spacing:1px;font-family:var(--mono);}
+.badge-green{background:rgba(72,187,120,0.12);color:var(--green);border:1px solid rgba(72,187,120,0.2);}
+.badge-yellow{background:rgba(246,224,94,0.1);color:var(--yellow);border:1px solid rgba(246,224,94,0.2);}
+.badge-red{background:rgba(252,129,129,0.1);color:var(--red);border:1px solid rgba(252,129,129,0.2);}
+.badge-blue{background:rgba(99,179,237,0.1);color:var(--accent);border:1px solid rgba(99,179,237,0.2);}
+.badge-purple{background:rgba(183,148,244,0.1);color:var(--purple);border:1px solid rgba(183,148,244,0.2);}
+.table-actions{display:flex;gap:6px;}
+.btn-edit,.btn-del{
+  padding:4px 10px;border-radius:4px;font-size:10px;
+  cursor:pointer;font-family:var(--mono);border:none;transition:opacity 0.2s;
+}
+.btn-edit{background:rgba(99,179,237,0.15);color:var(--accent);}
+.btn-edit:hover{background:rgba(99,179,237,0.28);}
+.btn-del{background:rgba(252,129,129,0.12);color:var(--red);}
+.btn-del:hover{background:rgba(252,129,129,0.25);}
+
+/* ── MODAL ── */
+#modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);
+  z-index:1000;display:none;align-items:center;justify-content:center;
+}
+#modal-overlay.open{display:flex;}
+.modal{
+  background:var(--panel);border:1px solid var(--border2);border-radius:12px;
+  width:520px;max-height:85vh;display:flex;flex-direction:column;
+  box-shadow:0 20px 60px rgba(0,0,0,0.6);
+  animation:modalIn 0.25s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+@keyframes modalIn{0%{transform:scale(0.9);opacity:0}100%{transform:scale(1);opacity:1}}
+.modal-header{
+  padding:18px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+}
+.modal-title{font-size:15px;font-weight:700;color:var(--text);}
+.modal-close{
+  width:28px;height:28px;border-radius:6px;border:none;
+  background:rgba(252,129,129,0.12);color:var(--red);cursor:pointer;
+  font-size:14px;transition:background 0.2s;
+}
+.modal-close:hover{background:rgba(252,129,129,0.25);}
+.modal-body{padding:20px;overflow-y:auto;flex:1;}
+.modal-body::-webkit-scrollbar{width:4px;}
+.modal-body::-webkit-scrollbar-thumb{background:rgba(99,179,237,0.25);border-radius:2px;}
+.modal-footer{
+  padding:14px 20px;border-top:1px solid var(--border);
+  display:flex;justify-content:flex-end;gap:10px;flex-shrink:0;
+}
+.form-row{margin-bottom:14px;}
+.form-label{font-size:10px;color:var(--text2);letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:5px;font-family:var(--mono);}
+.form-input,.form-select,.form-textarea{
+  width:100%;padding:9px 12px;border-radius:6px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  color:var(--text);font-family:var(--mono);font-size:12px;
+  outline:none;transition:border-color 0.2s,box-shadow 0.2s;
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus{
+  border-color:var(--accent);box-shadow:0 0 0 2px rgba(99,179,237,0.12);
+}
+.form-select option{background:var(--bg2);color:var(--text);}
+.form-textarea{height:90px;resize:vertical;}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.btn-cancel{
+  padding:8px 18px;border-radius:6px;border:1px solid var(--border);
+  background:transparent;color:var(--text2);font-family:var(--mono);
+  font-size:11px;cursor:pointer;transition:border-color 0.2s;
+}
+.btn-cancel:hover{border-color:var(--border2);}
+.btn-save{
+  padding:8px 20px;border-radius:6px;border:none;
+  background:linear-gradient(135deg,var(--accent2),var(--accent));
+  color:var(--bg);font-family:var(--mono);font-size:11px;font-weight:700;
+  cursor:pointer;letter-spacing:0.5px;transition:opacity 0.2s;
+}
+.btn-save:hover{opacity:0.88;}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:24px;right:24px;z-index:9998;
+  padding:12px 20px;border-radius:8px;
+  font-family:var(--mono);font-size:12px;letter-spacing:0.5px;
+  transform:translateY(80px);opacity:0;
+  transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1),opacity 0.3s ease;
+  pointer-events:none;
+}
+#toast.show{transform:translateY(0);opacity:1;}
+#toast.success{background:rgba(72,187,120,0.15);border:1px solid rgba(72,187,120,0.3);color:var(--green);}
+#toast.error{background:rgba(252,129,129,0.12);border:1px solid rgba(252,129,129,0.3);color:var(--red);}
+#toast.info{background:rgba(99,179,237,0.12);border:1px solid rgba(99,179,237,0.25);color:var(--accent);}
+
+/* ── EMPTY STATE ── */
+.empty-state{
+  text-align:center;padding:48px 20px;color:var(--text3);
+}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+.empty-text{font-size:13px;margin-bottom:4px;color:var(--text2);}
+.empty-sub{font-size:11px;font-family:var(--mono);}
+
+/* ── ABOUT EDITOR ── */
+.about-editor-wrap{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:24px;}
+.about-editor-wrap .form-row{margin-bottom:16px;}
+.save-about{
+  padding:10px 24px;border-radius:6px;border:none;
+  background:linear-gradient(135deg,var(--accent2),var(--accent));
+  color:var(--bg);font-family:var(--mono);font-size:12px;font-weight:700;
+  cursor:pointer;letter-spacing:0.5px;transition:opacity 0.2s;margin-top:4px;
+}
+.save-about:hover{opacity:0.88;}
+</style>
+</head>
+<body>
+
+<!-- ════ LOGIN ════ -->
+<div id="login-screen">
+  <div class="login-wrap">
+    <div class="login-logo">
+      <div class="login-logo-icon">ZAIDI</div>
+      <div class="login-logo-sub">Admin Control Panel</div>
+    </div>
+    <div class="login-title">Welcome back 👋</div>
+    <div class="login-sub">// authenticate to continue</div>
+    <div class="login-field">
+      <label class="login-label">Username</label>
+      <input class="login-input" id="login-user" type="text" placeholder="admin" autocomplete="off"/>
+    </div>
+    <div class="login-field">
+      <label class="login-label">Password</label>
+      <input class="login-input" id="login-pass" type="password" placeholder="••••••••"/>
+    </div>
+    <button class="login-btn" onclick="doLogin()">AUTHENTICATE →</button>
+    <div class="login-error" id="login-error">⚠ Invalid credentials. Try again.</div>
+    <div class="login-hint">Admin access restricted. Use secret key combo: <kbd>Ctrl+Shift+A</kbd></div>
+  </div>
+</div>
+
+<!-- ════ DASHBOARD ════ -->
+<div id="dashboard">
+
+  <!-- TOP NAV -->
+  <div id="topnav">
+    <div class="nav-logo">ZAIDI</div>
+    <span class="nav-slash">/</span>
+    <span class="nav-page" id="nav-page">dashboard</span>
+    <div class="nav-spacer"></div>
+    <div class="nav-badge"><div class="nav-dot"></div>LIVE</div>
+    <button class="nav-logout" onclick="doLogout()">LOGOUT</button>
+  </div>
+
+  <div id="main-layout">
+
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Overview</div>
+        <div class="sidebar-item active" onclick="showSection('home')" id="nav-home">
+          <span class="sidebar-icon">📊</span> Dashboard
+        </div>
+      </div>
+      <div class="sidebar-sep"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Content</div>
+        <div class="sidebar-item" onclick="showSection('projects')" id="nav-projects">
+          <span class="sidebar-icon">📁</span> Projects
+          <span class="sidebar-count" id="cnt-projects">0</span>
+        </div>
+        <div class="sidebar-item" onclick="showSection('skills')" id="nav-skills">
+          <span class="sidebar-icon">⚡</span> Skills
+          <span class="sidebar-count" id="cnt-skills">0</span>
+        </div>
+        <div class="sidebar-item" onclick="showSection('ctf')" id="nav-ctf">
+          <span class="sidebar-icon">🚩</span> CTF Writeups
+          <span class="sidebar-count" id="cnt-ctf">0</span>
+        </div>
+        <div class="sidebar-item" onclick="showSection('certs')" id="nav-certs">
+          <span class="sidebar-icon">🏅</span> Certifications
+          <span class="sidebar-count" id="cnt-certs">0</span>
+        </div>
+        <div class="sidebar-item" onclick="showSection('blog')" id="nav-blog">
+          <span class="sidebar-icon">✍️</span> Blog Posts
+          <span class="sidebar-count" id="cnt-blog">0</span>
+        </div>
+      </div>
+      <div class="sidebar-sep"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Profile</div>
+        <div class="sidebar-item" onclick="showSection('about')" id="nav-about">
+          <span class="sidebar-icon">👤</span> About Me
+        </div>
+        <div class="sidebar-item" onclick="showSection('contact')" id="nav-contact">
+          <span class="sidebar-icon">📬</span> Contact Info
+        </div>
+      </div>
+      <div class="sidebar-sep"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">System</div>
+        <div class="sidebar-item" onclick="window.open('mint-desktop.html','_blank')">
+          <span class="sidebar-icon">🟢</span> View Dev Site
+        </div>
+        <div class="sidebar-item" onclick="window.open('desktop-kali.html','_blank')">
+          <span class="sidebar-icon">🔴</span> View Sec Site
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div id="content">
+      <!-- sections injected here -->
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Add Item</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveModal()">SAVE →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ════════════════════════════════
+// DATA STORE (API-backed)
+// ════════════════════════════════
+const API_URL = 'http://localhost:5000/api';
+let DB = {};
+
+async function loadDB(){
+  try {
+    // Load all data from API in parallel
+    const [projects, skills, ctf, certs, blog, about] = await Promise.all([
+      fetch(`${API_URL}/projects`).then(r => r.json()).catch(() => []),
+      fetch(`${API_URL}/skills`).then(r => r.json()).catch(() => []),
+      fetch(`${API_URL}/ctf`).then(r => r.json()).catch(() => []),
+      fetch(`${API_URL}/certs`).then(r => r.json()).catch(() => []),
+      fetch(`${API_URL}/blog`).then(r => r.json()).catch(() => []),
+      fetch(`${API_URL}/about`).then(r => r.json()).catch(() => []),
+    ]);
+
+    // Default data for first-time setup
+    const aboutData = Array.isArray(about) ? about[0] : about;
+    const defaultAbout = {
+      name: 'Syed Turab Haider Zaidi',
+      nickname: 'Zaidi Sama',
+      title: 'Full Stack Developer & CS Student',
+      location: 'Lahore, Pakistan',
+      university: 'Superior University, Lahore',
+      degree: 'ADP — Computer Science (Completed)',
+      bio: 'Full Stack MERN Developer and Computer Science graduate from Superior University, Lahore. I build responsive, creative websites and provide complete webpage solutions and consultancy to clients. Beyond the web, I have a solid grip on C++ with Data Structures & Algorithms, OOP, and Programming Fundamentals.',
+      github: 'https://github.com/turabdev',
+      linkedin: 'https://www.linkedin.com/in/turab-zaidi-b4a7132b6/',
+      email: 'turabzaidi1971@gmail.com',
+      htb: '',
+      cvUrl: '',
+      twitter: '',
+    };
+
+    const defaultProjects = [
+      { name: 'Xhibiter', desc: 'NFT marketplace demo — modern Web3-style UI with animated hero, clean card layouts, and dark aesthetic.', tech: 'HTML, CSS, JavaScript, React', url: 'https://xhibiter-nft-eta.vercel.app/', status: 'done', emoji: '🖼️' },
+      { name: 'Ideko', desc: 'Modern business website demo — professional multi-section layout with services, testimonials, and clean typography.', tech: 'HTML, CSS, JavaScript', url: 'https://ideko-modern.vercel.app/', status: 'done', emoji: '💼' },
+      { name: 'Project Onix', desc: 'Digital agency website demo — bold design with agency services, portfolio section, and creative transitions.', tech: 'HTML, CSS, JavaScript', url: 'https://project-onix-digital.vercel.app/', status: 'done', emoji: '🚀' },
+      { name: 'HexShop', desc: 'E-commerce store demo — full product listing UI with cart interactions, filter system, and responsive grid layout.', tech: 'HTML, CSS, JavaScript, React', url: 'https://hexshop.vercel.app/', status: 'done', emoji: '🛒' },
+      { name: 'Fierce Finance', desc: 'Fintech landing page demo — professional financial services UI with stats, pricing section, and modern layout.', tech: 'HTML, CSS, JavaScript', url: 'https://fierce-finance.vercel.app/', status: 'done', emoji: '💰' },
+    ];
+
+    const defaultSkills = [
+      { name: 'HTML & CSS', category: 'Frontend', level: 90 },
+      { name: 'JavaScript', category: 'Frontend', level: 82 },
+      { name: 'React', category: 'Frontend', level: 85 },
+      { name: 'Responsive Design', category: 'Frontend', level: 88 },
+      { name: 'WordPress', category: 'Frontend', level: 75 },
+      { name: 'Figma / UI Design', category: 'Frontend', level: 70 },
+      { name: 'Node.js / Express', category: 'Backend', level: 60 },
+      { name: 'MongoDB', category: 'Backend', level: 58 },
+      { name: 'REST API Design', category: 'Backend', level: 62 },
+      { name: 'C++ & OOP', category: 'Other', level: 78 },
+      { name: 'Data Structures & Algorithms', category: 'Other', level: 72 },
+      { name: 'Programming Fundamentals', category: 'Other', level: 80 },
+      { name: 'Git & GitHub', category: 'Tools', level: 80 },
+      { name: 'Vercel / Deployment', category: 'Tools', level: 75 },
+      { name: 'VS Code', category: 'Tools', level: 90 },
+    ];
+
+    const defaultCTF = [
+      { name: 'Nibbles', platform: 'HTB', os: 'Linux', difficulty: 'easy', tags: 'File Upload, PHP Webshell, Sudo Privesc', date: '2025-03-15', status: 'rooted' },
+      { name: 'Jerry', platform: 'HTB', os: 'Windows', difficulty: 'easy', tags: 'Apache Tomcat, WAR Upload, Msfvenom', date: '2025-02-20', status: 'rooted' },
+      { name: 'Blue', platform: 'HTB', os: 'Windows', difficulty: 'easy', tags: 'EternalBlue, MS17-010, Metasploit', date: '2025-02-10', status: 'rooted' },
+      { name: 'Lame', platform: 'HTB', os: 'Linux', difficulty: 'medium', tags: 'Samba, CVE-2007-2447, Command Injection', date: '2025-01-28', status: 'rooted' },
+    ];
+
+    const defaultCerts = [
+      { name: 'ADP — Computer Science', org: 'Superior University, Lahore', progress: 100, status: 'done' },
+      { name: 'CPTS — Certified Penetration Testing Specialist', org: 'Hack The Box Academy', progress: 25, status: 'inprogress' },
+      { name: 'HTB Starting Point — All Machines', org: 'Hack The Box', progress: 100, status: 'done' },
+      { name: 'HTB Academy — Getting Started Module', org: 'HTB Academy', progress: 100, status: 'done' },
+      { name: 'eJPT — Junior Penetration Tester', org: 'eLearnSecurity', progress: 0, status: 'planned' },
+    ];
+
+    const defaultBlog = [
+      { title: 'How I Built 5 Production-Quality Demo Websites', category: 'Dev', date: '2025-06-01', status: 'draft', excerpt: 'A walkthrough of my process building Xhibiter, Ideko, Onix, HexShop and Fierce Finance — design decisions, tech choices, and lessons learned.' },
+      { title: 'MERN Stack from Zero: What I Learned as a CS Student', category: 'Dev', date: '2025-06-01', status: 'draft', excerpt: 'My honest experience learning MongoDB, Express, React, and Node.js as a CS student at Superior University — what clicked, what didn\'t.' },
+      { title: 'C++ DSA Patterns Every CS Student Should Know', category: 'Dev', date: '2025-06-01', status: 'draft', excerpt: 'The data structures and algorithm patterns I found most useful from my CS fundamentals and OOP coursework at Superior University.' },
+    ];
+
+    DB = {
+      projects: (Array.isArray(projects) && projects.length > 0) ? projects : defaultProjects,
+      skills: (Array.isArray(skills) && skills.length > 0) ? skills : defaultSkills,
+      ctf: (Array.isArray(ctf) && ctf.length > 0) ? ctf : defaultCTF,
+      certs: (Array.isArray(certs) && certs.length > 0) ? certs : defaultCerts,
+      blog: (Array.isArray(blog) && blog.length > 0) ? blog : defaultBlog,
+      about: (aboutData && Object.keys(aboutData).length > 0) ? aboutData : defaultAbout,
+    };
+    updateCounts();
+  } catch(err){
+    console.error('Failed to load data:', err);
+    showToast('⚠ Could not load data from server','error');
+  }
+}
+
+function saveDB(){
+  // This is now handled by individual API calls in saveModal, etc.
+  updateCounts();
+}
+
+function updateCounts(){
+  ['projects','skills','ctf','certs','blog'].forEach(k=>{
+    const el = document.getElementById('cnt-'+k);
+    if(el) el.textContent = (DB[k]||[]).length;
+  });
+}
+
+// ════════════════════════════════
+// AUTH
+// ════════════════════════════════
+let authToken = sessionStorage.getItem('zaidi_admin_token');
+
+async function doLogin(){
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value.trim();
+  const err = document.getElementById('login-error');
+  
+  try {
+    const res = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: u, password: p })
+    });
+    
+    if(!res.ok) throw new Error('Invalid credentials');
+    
+    const data = await res.json();
+    authToken = data.token;
+    sessionStorage.setItem('zaidi_admin_token', authToken);
+    err.style.display = 'none';
+    
+    document.getElementById('login-screen').classList.add('out');
+    setTimeout(()=>{
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('dashboard').classList.add('visible');
+      loadDB(); // Load data after successful login
+      showSection('home');
+    }, 500);
+  } catch(e){
+    err.style.display = 'block';
+    document.getElementById('login-pass').value = '';
+  }
+}
+
+function doLogout(){
+  sessionStorage.removeItem('zaidi_admin_token');
+  authToken = null;
+  document.getElementById('dashboard').classList.remove('visible');
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-screen').classList.remove('out');
+}
+
+// Secret access: Ctrl+Shift+A to bypass login (for admin only)
+let secretKeySequence = '';
+const SECRET_CODE = 'adminaccess2026';
+
+document.addEventListener('DOMContentLoaded',()=>{
+  // Global keydown listener for secret combo
+  document.addEventListener('keydown', (e) => {
+    // Ctrl+Shift+A = instant admin access (bypasses login screen)
+    if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+      e.preventDefault();
+      if (authToken) {
+        // Already logged in, just hide login screen
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('dashboard').classList.add('visible');
+        loadDB();
+        showSection('home');
+      }
+    }
+  });
+
+  document.getElementById('login-pass').addEventListener('keydown', e=>{
+    if(e.key==='Enter') doLogin();
+  });
+  document.getElementById('login-user').addEventListener('keydown', e=>{
+    if(e.key==='Enter') document.getElementById('login-pass').focus();
+  });
+
+  // Auto-login if token exists
+  if(!authToken){
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('dashboard').classList.add('visible');
+    loadDB();
+    showSection('home');
+  }
+});
+
+// ════════════════════════════════
+// SECTIONS
+// ════════════════════════════════
+let currentSection = 'home';
+
+function showSection(id){
+  currentSection = id;
+  document.querySelectorAll('.sidebar-item').forEach(el=>el.classList.remove('active'));
+  const navEl = document.getElementById('nav-'+id);
+  if(navEl) navEl.classList.add('active');
+  document.getElementById('nav-page').textContent = id;
+  const content = document.getElementById('content');
+  content.innerHTML = '';
+
+  switch(id){
+    case 'home':     content.appendChild(renderHome()); break;
+    case 'projects': content.appendChild(renderProjects()); break;
+    case 'skills':   content.appendChild(renderSkills()); break;
+    case 'ctf':      content.appendChild(renderCTF()); break;
+    case 'certs':    content.appendChild(renderCerts()); break;
+    case 'blog':     content.appendChild(renderBlog()); break;
+    case 'about':    content.appendChild(renderAbout()); break;
+    case 'contact':  content.appendChild(renderContact()); break;
+  }
+}
+
+// ── HOME ──
+function renderHome(){
+  const d = document.createElement('div');
+  const totalItems = (DB.projects||[]).length + (DB.skills||[]).length + (DB.ctf||[]).length + (DB.blog||[]).length;
+  d.innerHTML = `
+    <div class="dash-header">
+      <div class="dash-title">Welcome back, Zaidi 👋</div>
+      <div class="dash-sub">// ${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-card-icon">📁</div>
+        <div class="stat-card-num" style="color:var(--accent)">${(DB.projects||[]).length}</div>
+        <div class="stat-card-label">Projects</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">🚩</div>
+        <div class="stat-card-num" style="color:var(--green)">${(DB.ctf||[]).length}</div>
+        <div class="stat-card-label">CTF Writeups</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">✍️</div>
+        <div class="stat-card-num" style="color:var(--purple)">${(DB.blog||[]).length}</div>
+        <div class="stat-card-label">Blog Posts</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">📦</div>
+        <div class="stat-card-num" style="color:var(--yellow)">${totalItems}</div>
+        <div class="stat-card-label">Total Items</div>
+      </div>
+    </div>
+    <div class="quick-actions">
+      <div class="qa-title">Quick Actions</div>
+      <div class="qa-grid">
+        <button class="qa-btn" onclick="showSection('projects');setTimeout(()=>openAddModal('projects'),100)">
+          <span class="qa-btn-icon">➕</span><span class="qa-btn-text">Add Project</span>
+        </button>
+        <button class="qa-btn" onclick="showSection('ctf');setTimeout(()=>openAddModal('ctf'),100)">
+          <span class="qa-btn-icon">🚩</span><span class="qa-btn-text">Add CTF Writeup</span>
+        </button>
+        <button class="qa-btn" onclick="showSection('skills');setTimeout(()=>openAddModal('skills'),100)">
+          <span class="qa-btn-icon">⚡</span><span class="qa-btn-text">Add Skill</span>
+        </button>
+        <button class="qa-btn" onclick="showSection('blog');setTimeout(()=>openAddModal('blog'),100)">
+          <span class="qa-btn-icon">✍️</span><span class="qa-btn-text">New Blog Post</span>
+        </button>
+        <button class="qa-btn" onclick="showSection('certs');setTimeout(()=>openAddModal('certs'),100)">
+          <span class="qa-btn-icon">🏅</span><span class="qa-btn-text">Add Certificate</span>
+        </button>
+        <button class="qa-btn" onclick="showSection('about')">
+          <span class="qa-btn-icon">👤</span><span class="qa-btn-text">Edit About Me</span>
+        </button>
+      </div>
+    </div>`;
+  return d;
+}
+
+// ── PROJECTS ──
+function renderProjects(){
+  const d = document.createElement('div');
+  const rows = (DB.projects||[]).map((p,i)=>`
+    <tr>
+      <td class="td-title">${p.name}</td>
+      <td>${p.desc.substring(0,45)}...</td>
+      <td><span style="font-size:10px;color:var(--text3)">${p.tech.split(',').slice(0,2).join(', ')}</span></td>
+      <td>${statusBadge(p.status)}</td>
+      <td><div class="table-actions">
+        <button class="btn-edit" onclick="openEditModal('projects',${i})">Edit</button>
+        <button class="btn-del" onclick="deleteItem('projects',${i})">Del</button>
+      </div></td>
+    </tr>`).join('');
+  d.innerHTML = `
+    <div class="section-header">
+      <div class="section-title">📁 Projects</div>
+      <button class="btn-add" onclick="openAddModal('projects')">+ Add Project</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Description</th><th>Tech Stack</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${rows || emptyRow()}</tbody>
+      </table>
+    </div>`;
+  return d;
+}
+
+// ── SKILLS ──
+function renderSkills(){
+  const d = document.createElement('div');
+  const rows = (DB.skills||[]).map((s,i)=>`
+    <tr>
+      <td class="td-title">${s.name}</td>
+      <td><span class="badge badge-blue">${s.category}</span></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="flex:1;height:4px;background:rgba(99,179,237,0.1);border-radius:2px;min-width:80px">
+            <div style="height:100%;width:${s.level}%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:2px"></div>
+          </div>
+          <span style="font-size:10px;color:var(--accent);font-family:var(--mono)">${s.level}%</span>
+        </div>
+      </td>
+      <td><div class="table-actions">
+        <button class="btn-edit" onclick="openEditModal('skills',${i})">Edit</button>
+        <button class="btn-del" onclick="deleteItem('skills',${i})">Del</button>
+      </div></td>
+    </tr>`).join('');
+  d.innerHTML = `
+    <div class="section-header">
+      <div class="section-title">⚡ Skills</div>
+      <button class="btn-add" onclick="openAddModal('skills')">+ Add Skill</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Skill Name</th><th>Category</th><th>Proficiency</th><th>Actions</th></tr></thead>
+        <tbody>${rows || emptyRow()}</tbody>
+      </table>
+    </div>`;
+  return d;
+}
+
+// ── CTF ──
+function renderCTF(){
+  const d = document.createElement('div');
+  const rows = (DB.ctf||[]).map((c,i)=>`
+    <tr>
+      <td class="td-title">${c.name}</td>
+      <td><span class="badge badge-blue">${c.platform}</span></td>
+      <td>${c.os}</td>
+      <td>${diffBadge(c.difficulty)}</td>
+      <td style="font-size:10px;color:var(--text3)">${c.date}</td>
+      <td><div class="table-actions">
+        <button class="btn-edit" onclick="openEditModal('ctf',${i})">Edit</button>
+        <button class="btn-del" onclick="deleteItem('ctf',${i})">Del</button>
+      </div></td>
+    </tr>`).join('');
+  d.innerHTML = `
+    <div class="section-header">
+      <div class="section-title">🚩 CTF Writeups</div>
+      <button class="btn-add" onclick="openAddModal('ctf')">+ Add Writeup</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Machine</th><th>Platform</th><th>OS</th><th>Difficulty</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody>${rows || emptyRow()}</tbody>
+      </table>
+    </div>`;
+  return d;
+}
+
+// ── CERTS ──
+function renderCerts(){
+  const d = document.createElement('div');
+  const rows = (DB.certs||[]).map((c,i)=>`
+    <tr>
+      <td class="td-title">${c.name}</td>
+      <td>${c.org}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="flex:1;height:4px;background:rgba(99,179,237,0.1);border-radius:2px;min-width:80px">
+            <div style="height:100%;width:${c.progress}%;background:linear-gradient(90deg,var(--green),#68d391);border-radius:2px"></div>
+          </div>
+          <span style="font-size:10px;color:var(--green);font-family:var(--mono)">${c.progress}%</span>
+        </div>
+      </td>
+      <td>${certBadge(c.status)}</td>
+      <td><div class="table-actions">
+        <button class="btn-edit" onclick="openEditModal('certs',${i})">Edit</button>
+        <button class="btn-del" onclick="deleteItem('certs',${i})">Del</button>
+      </div></td>
+    </tr>`).join('');
+  d.innerHTML = `
+    <div class="section-header">
+      <div class="section-title">🏅 Certifications</div>
+      <button class="btn-add" onclick="openAddModal('certs')">+ Add Cert</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Certification</th><th>Organization</th><th>Progress</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${rows || emptyRow()}</tbody>
+      </table>
+    </div>`;
+  return d;
+}
+
+// ── BLOG ──
+function renderBlog(){
+  const d = document.createElement('div');
+  const rows = (DB.blog||[]).map((b,i)=>`
+    <tr>
+      <td class="td-title">${b.title.substring(0,50)}${b.title.length>50?'...':''}</td>
+      <td><span class="badge badge-purple">${b.category}</span></td>
+      <td style="font-size:10px;color:var(--text3)">${b.date}</td>
+      <td>${b.status==='published'?'<span class="badge badge-green">PUBLISHED</span>':'<span class="badge badge-yellow">DRAFT</span>'}</td>
+      <td><div class="table-actions">
+        <button class="btn-edit" onclick="openEditModal('blog',${i})">Edit</button>
+        <button class="btn-del" onclick="deleteItem('blog',${i})">Del</button>
+      </div></td>
+    </tr>`).join('');
+  d.innerHTML = `
+    <div class="section-header">
+      <div class="section-title">✍️ Blog Posts</div>
+      <button class="btn-add" onclick="openAddModal('blog')">+ New Post</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Title</th><th>Category</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${rows || emptyRow()}</tbody>
+      </table>
+    </div>`;
+  return d;
+}
+
+// ── ABOUT ──
+function renderAbout(){
+  const a = DB.about || {};
+  const d = document.createElement('div');
+  d.innerHTML = `
+    <div class="section-header">
+      <div class="section-title">👤 About Me</div>
+    </div>
+    <div class="about-editor-wrap">
+      <div class="form-row-2 form-row">
+        <div>
+          <label class="form-label">Full Name</label>
+          <input class="form-input" id="ab-name" value="${a.name||''}" />
+        </div>
+        <div>
+          <label class="form-label">Nickname</label>
+          <input class="form-input" id="ab-nick" value="${a.nickname||''}" />
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Professional Title</label>
+        <input class="form-input" id="ab-title" value="${a.title||''}" />
+      </div>
+      <div class="form-row-2 form-row">
+        <div>
+          <label class="form-label">Location</label>
+          <input class="form-input" id="ab-loc" value="${a.location||''}" />
+        </div>
+        <div>
+          <label class="form-label">University</label>
+          <input class="form-input" id="ab-uni" value="${a.university||''}" />
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Bio</label>
+        <textarea class="form-textarea" id="ab-bio" style="height:100px">${a.bio||''}</textarea>
+      </div>
+      <div class="form-row-2 form-row">
+        <div>
+          <label class="form-label">GitHub URL</label>
+          <input class="form-input" id="ab-github" value="${a.github||''}" />
+        </div>
+        <div>
+          <label class="form-label">LinkedIn URL</label>
+          <input class="form-input" id="ab-linkedin" value="${a.linkedin||''}" />
+        </div>
+      </div>
+      <div class="form-row-2 form-row">
+        <div>
+          <label class="form-label">Email</label>
+          <input class="form-input" id="ab-email" value="${a.email||''}" />
+        </div>
+        <div>
+          <label class="form-label">HTB Profile</label>
+          <input class="form-input" id="ab-htb" value="${a.htb||''}" />
+        </div>
+      </div>
+      <button class="save-about" onclick="saveAbout()">SAVE CHANGES →</button>
+    </div>`;
+  return d;
+}
+
+async function saveAbout(){
+  try {
+    DB.about = {
+      name: document.getElementById('ab-name').value,
+      nickname: document.getElementById('ab-nick').value,
+      title: document.getElementById('ab-title').value,
+      location: document.getElementById('ab-loc').value,
+      university: document.getElementById('ab-uni').value,
+      bio: document.getElementById('ab-bio').value,
+      github: document.getElementById('ab-github').value,
+      linkedin: document.getElementById('ab-linkedin').value,
+      email: document.getElementById('ab-email').value,
+      htb: document.getElementById('ab-htb').value,
+    };
+    
+    const method = DB.about.id ? 'PUT' : 'POST';
+    const url = DB.about.id ? `${API_URL}/about/${DB.about.id}` : `${API_URL}/about`;
+    
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify(DB.about)
+    });
+
+    if(!res.ok) throw new Error(`Server error: ${res.statusText}`);
+    
+    const saved = await res.json();
+    DB.about = saved;
+    showToast('About Me saved ✓','success');
+  } catch(e){
+    console.error('Save error:', e);
+    showToast('Error saving: ' + e.message,'error');
+  }
+}
+
+// ── CONTACT ──
+function renderContact(){
+  const a = DB.about || {};
+  const d = document.createElement('div');
+  d.innerHTML = `
+    <div class="section-header">
+      <div class="section-title">📬 Contact Info</div>
+    </div>
+    <div class="about-editor-wrap">
+      <div class="form-row">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" id="ct-email" value="${a.email||''}" />
+      </div>
+      <div class="form-row">
+        <label class="form-label">GitHub</label>
+        <input class="form-input" id="ct-github" value="${a.github||''}" />
+      </div>
+      <div class="form-row">
+        <label class="form-label">LinkedIn</label>
+        <input class="form-input" id="ct-linkedin" value="${a.linkedin||''}" />
+      </div>
+      <div class="form-row">
+        <label class="form-label">HTB Profile</label>
+        <input class="form-input" id="ct-htb" value="${a.htb||''}" />
+      </div>
+      <div class="form-row">
+        <label class="form-label">Location</label>
+        <input class="form-input" id="ct-loc" value="${a.location||''}" />
+      </div>
+      <button class="save-about" onclick="saveContact()">SAVE CHANGES →</button>
+    </div>`;
+  return d;
+}
+
+async function saveContact(){
+  try {
+    const aboutData = {
+      email: document.getElementById('ct-email').value,
+      github: document.getElementById('ct-github').value,
+      linkedin: document.getElementById('ct-linkedin').value,
+      htb: document.getElementById('ct-htb').value,
+      location: document.getElementById('ct-loc').value,
+    };
+    
+    const method = DB.about.id ? 'PUT' : 'POST';
+    const url = DB.about.id ? `${API_URL}/about/${DB.about.id}` : `${API_URL}/about`;
+    
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify({...DB.about, ...aboutData})
+    });
+
+    if(!res.ok) throw new Error(`Server error: ${res.statusText}`);
+    
+    const saved = await res.json();
+    DB.about = saved;
+    showToast('Contact info saved ✓','success');
+  } catch(e){
+    console.error('Save error:', e);
+    showToast('Error saving: ' + e.message,'error');
+  }
+}
+
+// ════════════════════════════════
+// MODAL CRUD
+// ════════════════════════════════
+let modalState = { type: null, index: null };
+
+const modalForms = {
+  projects: (d={})=>`
+    <div class="form-row"><label class="form-label">Project Name</label><input class="form-input" id="mf-name" value="${d.name||''}"/></div>
+    <div class="form-row"><label class="form-label">Description</label><textarea class="form-textarea" id="mf-desc">${d.desc||''}</textarea></div>
+    <div class="form-row"><label class="form-label">Tech Stack (comma separated)</label><input class="form-input" id="mf-tech" value="${d.tech||''}"/></div>
+    <div class="form-row"><label class="form-label">Project URL</label><input class="form-input" id="mf-url" value="${d.url||''}" placeholder="https://github.com/..."/></div>
+    <div class="form-row"><label class="form-label">Status</label>
+      <select class="form-select" id="mf-status">
+        <option value="active" ${d.status==='active'?'selected':''}>Active</option>
+        <option value="wip" ${d.status==='wip'?'selected':''}>Work in Progress</option>
+        <option value="done" ${d.status==='done'?'selected':''}>Completed</option>
+        <option value="archived" ${d.status==='archived'?'selected':''}>Archived</option>
+      </select>
+    </div>`,
+
+  skills: (d={})=>`
+    <div class="form-row"><label class="form-label">Skill Name</label><input class="form-input" id="mf-name" value="${d.name||''}"/></div>
+    <div class="form-row"><label class="form-label">Category</label>
+      <select class="form-select" id="mf-category">
+        <option value="Frontend" ${d.category==='Frontend'?'selected':''}>Frontend</option>
+        <option value="Backend" ${d.category==='Backend'?'selected':''}>Backend</option>
+        <option value="Security" ${d.category==='Security'?'selected':''}>Security</option>
+        <option value="Tools" ${d.category==='Tools'?'selected':''}>Tools</option>
+        <option value="Other" ${d.category==='Other'?'selected':''}>Other</option>
+      </select>
+    </div>
+    <div class="form-row"><label class="form-label">Proficiency Level: <span id="lvl-display">${d.level||50}%</span></label>
+      <input type="range" id="mf-level" min="0" max="100" value="${d.level||50}" oninput="document.getElementById('lvl-display').textContent=this.value+'%'" style="width:100%;margin-top:8px;accent-color:var(--accent)"/>
+    </div>`,
+
+  ctf: (d={})=>`
+    <div class="form-row-2 form-row">
+      <div><label class="form-label">Machine Name</label><input class="form-input" id="mf-name" value="${d.name||''}"/></div>
+      <div><label class="form-label">Platform</label>
+        <select class="form-select" id="mf-platform">
+          <option value="HTB" ${d.platform==='HTB'?'selected':''}>Hack The Box</option>
+          <option value="THM" ${d.platform==='THM'?'selected':''}>TryHackMe</option>
+          <option value="CTFtime" ${d.platform==='CTFtime'?'selected':''}>CTFtime</option>
+          <option value="Other" ${d.platform==='Other'?'selected':''}>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row-2 form-row">
+      <div><label class="form-label">OS</label>
+        <select class="form-select" id="mf-os">
+          <option value="Linux" ${d.os==='Linux'?'selected':''}>Linux</option>
+          <option value="Windows" ${d.os==='Windows'?'selected':''}>Windows</option>
+          <option value="Other" ${d.os==='Other'?'selected':''}>Other</option>
+        </select>
+      </div>
+      <div><label class="form-label">Difficulty</label>
+        <select class="form-select" id="mf-difficulty">
+          <option value="easy" ${d.difficulty==='easy'?'selected':''}>Easy</option>
+          <option value="medium" ${d.difficulty==='medium'?'selected':''}>Medium</option>
+          <option value="hard" ${d.difficulty==='hard'?'selected':''}>Hard</option>
+          <option value="insane" ${d.difficulty==='insane'?'selected':''}>Insane</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row"><label class="form-label">Tags (comma separated)</label><input class="form-input" id="mf-tags" value="${d.tags||''}"/></div>
+    <div class="form-row"><label class="form-label">Date Completed</label><input class="form-input" type="date" id="mf-date" value="${d.date||''}"/></div>`,
+
+  certs: (d={})=>`
+    <div class="form-row"><label class="form-label">Certification Name</label><input class="form-input" id="mf-name" value="${d.name||''}"/></div>
+    <div class="form-row"><label class="form-label">Organization</label><input class="form-input" id="mf-org" value="${d.org||''}"/></div>
+    <div class="form-row"><label class="form-label">Progress: <span id="prog-display">${d.progress||0}%</span></label>
+      <input type="range" id="mf-progress" min="0" max="100" value="${d.progress||0}" oninput="document.getElementById('prog-display').textContent=this.value+'%'" style="width:100%;margin-top:8px;accent-color:var(--green)"/>
+    </div>
+    <div class="form-row"><label class="form-label">Status</label>
+      <select class="form-select" id="mf-status">
+        <option value="inprogress" ${d.status==='inprogress'?'selected':''}>In Progress</option>
+        <option value="done" ${d.status==='done'?'selected':''}>Completed</option>
+        <option value="planned" ${d.status==='planned'?'selected':''}>Planned</option>
+      </select>
+    </div>`,
+
+  blog: (d={})=>`
+    <div class="form-row"><label class="form-label">Post Title</label><input class="form-input" id="mf-title" value="${d.title||''}"/></div>
+    <div class="form-row-2 form-row">
+      <div><label class="form-label">Category</label>
+        <select class="form-select" id="mf-category">
+          <option value="HTB Writeup" ${d.category==='HTB Writeup'?'selected':''}>HTB Writeup</option>
+          <option value="Dev" ${d.category==='Dev'?'selected':''}>Dev</option>
+          <option value="OSINT" ${d.category==='OSINT'?'selected':''}>OSINT</option>
+          <option value="Security" ${d.category==='Security'?'selected':''}>Security</option>
+          <option value="Personal" ${d.category==='Personal'?'selected':''}>Personal</option>
+        </select>
+      </div>
+      <div><label class="form-label">Date</label><input class="form-input" type="date" id="mf-date" value="${d.date||''}"/></div>
+    </div>
+    <div class="form-row"><label class="form-label">Status</label>
+      <select class="form-select" id="mf-status">
+        <option value="draft" ${d.status==='draft'?'selected':''}>Draft</option>
+        <option value="published" ${d.status==='published'?'selected':''}>Published</option>
+      </select>
+    </div>`,
+};
+
+const modalGetters = {
+  projects: ()=>({
+    name: val('mf-name'), desc: val('mf-desc'), tech: val('mf-tech'),
+    url: val('mf-url'), status: val('mf-status'),
+    id: Date.now()
+  }),
+  skills: ()=>({
+    name: val('mf-name'), category: val('mf-category'),
+    level: parseInt(val('mf-level')), id: Date.now()
+  }),
+  ctf: ()=>({
+    name: val('mf-name'), platform: val('mf-platform'), os: val('mf-os'),
+    difficulty: val('mf-difficulty'), tags: val('mf-tags'), date: val('mf-date'),
+    id: Date.now()
+  }),
+  certs: ()=>({
+    name: val('mf-name'), org: val('mf-org'),
+    progress: parseInt(val('mf-progress')), status: val('mf-status'),
+    id: Date.now()
+  }),
+  blog: ()=>({
+    title: val('mf-title'), category: val('mf-category'),
+    date: val('mf-date'), status: val('mf-status'),
+    id: Date.now()
+  }),
+};
+
+function val(id){ const el=document.getElementById(id); return el?el.value:''; }
+
+function openAddModal(type){
+  modalState = { type, index: null };
+  document.getElementById('modal-title').textContent = `Add ${type.charAt(0).toUpperCase()+type.slice(1).replace(/s$/,'')}`;
+  document.getElementById('modal-body').innerHTML = modalForms[type]({});
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function openEditModal(type, index){
+  const item = DB[type][index];
+  modalState = { type, index };
+  document.getElementById('modal-title').textContent = `Edit ${type.charAt(0).toUpperCase()+type.slice(1).replace(/s$/,'')}`;
+  document.getElementById('modal-body').innerHTML = modalForms[type](item);
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  modalState = { type:null, index:null };
+}
+
+async function saveModal(){
+  const {type, index} = modalState;
+  if(!type) return;
+  const item = modalGetters[type]();
+
+  // Basic validation
+  const firstField = document.querySelector('#modal-body .form-input');
+  if(firstField && !firstField.value.trim()){
+    showToast('Please fill in the required fields','error');
+    firstField.focus();
+    return;
+  }
+
+  try {
+    const method = index === null ? 'POST' : 'PUT';
+    const url = index === null ? `${API_URL}/${type}` : `${API_URL}/${type}/${DB[type][index].id}`;
+    
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify(item)
+    });
+
+    if(!res.ok) throw new Error(`Server error: ${res.statusText}`);
+    
+    const savedItem = await res.json();
+    
+    if(index === null){
+      DB[type].push(savedItem);
+      showToast('Item added ✓','success');
+    } else {
+      DB[type][index] = savedItem;
+      showToast('Item updated ✓','success');
+    }
+    
+    closeModal();
+    showSection(type);
+  } catch(e){
+    console.error('Save error:', e);
+    showToast('Error saving item: ' + e.message,'error');
+  }
+}
+
+async function deleteItem(type, index){
+  const item = DB[type][index];
+  const name = item.name || item.title;
+  if(!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+  
+  try {
+    const res = await fetch(`${API_URL}/${type}/${item.id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+
+    if(!res.ok) throw new Error(`Server error: ${res.statusText}`);
+    
+    DB[type].splice(index, 1);
+    showToast('Item deleted','info');
+    showSection(type);
+  } catch(e){
+    console.error('Delete error:', e);
+    showToast('Error deleting item: ' + e.message,'error');
+  }
+}
+
+function emptyRow(){
+  return `<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text3);font-family:var(--mono);font-size:12px">
+    No items yet. Click "+ Add" to get started.
+  </td></tr>`;
+}
+
+// ════════════════════════════════
+// BADGE HELPERS
+// ════════════════════════════════
+function statusBadge(s){
+  const map={active:'badge-green',wip:'badge-yellow',done:'badge-blue',archived:'badge-red'};
+  return `<span class="badge ${map[s]||'badge-blue'}">${s?.toUpperCase()||'UNKNOWN'}</span>`;
+}
+function diffBadge(d){
+  const map={easy:'badge-green',medium:'badge-yellow',hard:'badge-red',insane:'badge-purple'};
+  return `<span class="badge ${map[d]||'badge-blue'}">${d?.toUpperCase()||''}</span>`;
+}
+function certBadge(s){
+  if(s==='done') return `<span class="badge badge-green">DONE</span>`;
+  if(s==='inprogress') return `<span class="badge badge-yellow">IN PROGRESS</span>`;
+  return `<span class="badge badge-red">PLANNED</span>`;
+}
+
+// ════════════════════════════════
+// TOAST
+// ════════════════════════════════
+let toastTimer = null;
+function showToast(msg, type='info'){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `show ${type}`;
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ el.className = type; }, 3000);
+}
+
+// Close modal on overlay click
+document.getElementById('modal-overlay').addEventListener('click', e=>{
+  if(e.target === document.getElementById('modal-overlay')) closeModal();
+});
+</script>
+</body>
+</html>

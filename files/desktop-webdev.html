@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ZAIDI — Web Dev Desktop</title>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Ubuntu+Mono&family=Orbitron:wght@700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;user-select:none;}
+:root{
+  --mint:#87c44a;
+  --mint2:#5da832;
+  --mint-dark:#3d7a1e;
+  --warm:#ff9a3c;
+  --warm2:#ffcd56;
+  --teal:#2eb8b8;
+  --panel-bg:rgba(30,35,30,0.92);
+  --dock-bg:rgba(20,28,20,0.88);
+  --win-title:#2a3020;
+  --win-bg:#f5f6f0;
+  --win-border:rgba(135,196,74,0.5);
+  --text-dark:#1a2010;
+  --text-mid:#3a4830;
+  --shadow:0 8px 40px rgba(0,0,0,0.45);
+}
+
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Ubuntu',sans-serif;}
+
+/* ── WALLPAPER ── */
+#desktop{
+  width:100%;height:100%;
+  position:relative;
+  background:
+    radial-gradient(ellipse at 20% 80%, rgba(93,168,50,0.35) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 20%, rgba(46,184,184,0.25) 0%, transparent 50%),
+    radial-gradient(ellipse at 60% 70%, rgba(255,154,60,0.15) 0%, transparent 45%),
+    radial-gradient(ellipse at 10% 10%, rgba(135,196,74,0.2) 0%, transparent 40%),
+    linear-gradient(135deg, #1a2e10 0%, #243820 30%, #1e3a28 60%, #152a1e 100%);
+  overflow:hidden;
+}
+
+/* Wallpaper organic shapes */
+#desktop::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    radial-gradient(ellipse 600px 400px at 75% 85%, rgba(135,196,74,0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 400px 300px at 25% 15%, rgba(46,184,184,0.06) 0%, transparent 70%);
+  pointer-events:none;
+}
+/* Grid texture */
+#desktop::after{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(135,196,74,0.03) 1px, transparent 1px),
+    linear-gradient(90deg,rgba(135,196,74,0.03) 1px, transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;
+}
+
+/* ── TOP PANEL ── */
+#top-panel{
+  position:absolute;top:0;left:0;right:0;height:30px;
+  background:var(--panel-bg);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(135,196,74,0.2);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;z-index:100;
+}
+.panel-left{display:flex;align-items:center;gap:16px;}
+.panel-logo{
+  font-family:'Orbitron',monospace;font-size:11px;font-weight:700;
+  color:var(--mint);letter-spacing:2px;
+  display:flex;align-items:center;gap:6px;
+}
+.panel-logo-dot{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 6px var(--mint);}
+.panel-menu-item{
+  font-size:12px;color:rgba(255,255,255,0.7);cursor:pointer;padding:0 6px;
+  transition:color 0.2s;
+}
+.panel-menu-item:hover{color:var(--mint);}
+.panel-right{display:flex;align-items:center;gap:14px;}
+.panel-indicator{display:flex;align-items:center;gap:5px;font-size:11px;color:rgba(255,255,255,0.65);}
+.panel-indicator svg{width:14px;height:14px;fill:rgba(255,255,255,0.6);}
+#panel-clock{font-size:12px;color:rgba(255,255,255,0.85);font-family:'Ubuntu Mono',monospace;letter-spacing:1px;}
+.panel-battery-bar{width:22px;height:10px;border:1.5px solid rgba(255,255,255,0.5);border-radius:2px;position:relative;overflow:hidden;}
+.panel-battery-bar::after{content:'';position:absolute;right:-4px;top:50%;transform:translateY(-50%);width:3px;height:5px;background:rgba(255,255,255,0.5);border-radius:0 1px 1px 0;}
+.panel-battery-fill{height:100%;background:var(--mint);border-radius:1px;transition:width 0.5s;}
+
+/* ── LEFT DOCK ── */
+#dock{
+  position:absolute;left:0;top:30px;bottom:0;width:62px;
+  background:var(--dock-bg);
+  backdrop-filter:blur(16px);
+  border-right:1px solid rgba(135,196,74,0.15);
+  display:flex;flex-direction:column;align-items:center;
+  padding:16px 0;gap:6px;z-index:90;
+}
+.dock-icon{
+  width:44px;height:44px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;position:relative;
+  transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1), background 0.2s;
+  font-size:22px;
+}
+.dock-icon:hover{transform:scale(1.25) translateX(5px);}
+.dock-icon:active{transform:scale(0.95) translateX(5px);}
+.dock-icon .dock-tooltip{
+  position:absolute;left:54px;
+  background:rgba(20,30,15,0.95);
+  border:1px solid rgba(135,196,74,0.3);
+  color:rgba(255,255,255,0.9);
+  font-size:11px;padding:4px 10px;
+  border-radius:4px;white-space:nowrap;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.15s;letter-spacing:0.5px;
+}
+.dock-icon:hover .dock-tooltip{opacity:1;}
+.dock-icon .dock-dot{
+  position:absolute;bottom:2px;left:50%;transform:translateX(-50%);
+  width:4px;height:4px;border-radius:50%;background:var(--mint);
+  opacity:0;transition:opacity 0.2s;
+}
+.dock-icon.active .dock-dot{opacity:1;}
+.dock-sep{width:36px;height:1px;background:rgba(135,196,74,0.2);margin:4px 0;}
+.dock-spacer{flex:1;}
+.dock-shutdown{
+  width:44px;height:44px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:20px;margin-bottom:8px;
+  transition:transform 0.2s, background 0.2s;
+  position:relative;
+}
+.dock-shutdown:hover{transform:scale(1.2) translateX(5px);background:rgba(255,60,60,0.2);}
+.dock-shutdown .dock-tooltip{
+  position:absolute;left:54px;
+  background:rgba(30,10,10,0.95);
+  border:1px solid rgba(255,80,80,0.3);
+  color:rgba(255,200,200,0.9);
+  font-size:11px;padding:4px 10px;
+  border-radius:4px;white-space:nowrap;
+  opacity:0;pointer-events:none;transition:opacity 0.15s;
+}
+.dock-shutdown:hover .dock-tooltip{opacity:1;}
+
+/* ── DESKTOP AREA ── */
+#desktop-area{
+  position:absolute;top:30px;left:62px;right:0;bottom:0;
+  overflow:hidden;
+}
+
+/* Desktop icons grid */
+#desktop-icons{
+  position:absolute;top:20px;right:20px;
+  display:flex;flex-direction:column;gap:8px;align-items:center;
+}
+.desktop-icon{
+  width:72px;display:flex;flex-direction:column;align-items:center;
+  gap:5px;cursor:pointer;padding:6px;border-radius:8px;
+  transition:background 0.15s;
+}
+.desktop-icon:hover{background:rgba(135,196,74,0.12);}
+.desktop-icon:active{background:rgba(135,196,74,0.22);}
+.desktop-icon .di-emoji{font-size:28px;line-height:1;}
+.desktop-icon .di-label{
+  font-size:11px;color:rgba(255,255,255,0.9);text-align:center;
+  text-shadow:0 1px 3px rgba(0,0,0,0.8);line-height:1.3;
+  font-family:'Ubuntu',sans-serif;
+}
+
+/* ── WINDOWS ── */
+.window{
+  position:absolute;
+  background:var(--win-bg);
+  border-radius:10px;
+  box-shadow:var(--shadow), 0 0 0 1px var(--win-border);
+  overflow:hidden;
+  min-width:320px;min-height:200px;
+  display:flex;flex-direction:column;
+  transform-origin:top left;
+}
+.window.opening{animation:winOpen 0.28s cubic-bezier(0.34,1.56,0.64,1) forwards;}
+.window.minimized{display:none;}
+.window.maximized{
+  top:0!important;left:0!important;
+  width:100%!important;height:100%!important;
+  border-radius:0;
+}
+@keyframes winOpen{
+  0%{transform:scale(0.85);opacity:0;}
+  100%{transform:scale(1);opacity:1;}
+}
+
+/* Title bar */
+.win-titlebar{
+  height:34px;
+  background:linear-gradient(135deg, #2e3d20, #3d5228);
+  display:flex;align-items:center;padding:0 10px;
+  cursor:grab;gap:8px;flex-shrink:0;
+  border-bottom:1px solid rgba(135,196,74,0.2);
+}
+.win-titlebar:active{cursor:grabbing;}
+.win-controls{display:flex;gap:6px;}
+.win-btn{
+  width:13px;height:13px;border-radius:50%;cursor:pointer;
+  border:none;transition:filter 0.15s, transform 0.15s;
+  display:flex;align-items:center;justify-content:center;
+  font-size:8px;color:transparent;
+}
+.win-btn:hover{filter:brightness(1.3);transform:scale(1.15);color:rgba(0,0,0,0.5);}
+.win-close{background:#ff5f57;}
+.win-min{background:#ffbd2e;}
+.win-max{background:#28c840;}
+.win-title{
+  flex:1;text-align:center;font-size:12px;
+  color:rgba(255,255,255,0.85);letter-spacing:0.5px;
+  font-family:'Ubuntu',sans-serif;font-weight:500;
+  margin-right:45px;
+}
+
+/* Window body */
+.win-body{
+  flex:1;overflow:auto;
+  background:var(--win-bg);
+}
+.win-body::-webkit-scrollbar{width:6px;}
+.win-body::-webkit-scrollbar-track{background:rgba(0,0,0,0.05);}
+.win-body::-webkit-scrollbar-thumb{background:var(--mint);border-radius:3px;}
+
+/* Resize handle */
+.win-resize{
+  position:absolute;bottom:0;right:0;
+  width:16px;height:16px;cursor:se-resize;
+  background:linear-gradient(135deg, transparent 50%, rgba(135,196,74,0.4) 50%);
+  border-radius:0 0 10px 0;
+}
+
+/* ── WINDOW CONTENTS ── */
+.content-pad{padding:24px;}
+
+/* About */
+.about-header{
+  display:flex;align-items:center;gap:20px;
+  padding:24px;
+  background:linear-gradient(135deg, #2e3d20, #3d5228);
+  color:white;
+}
+.about-avatar{
+  width:80px;height:80px;border-radius:50%;
+  background:linear-gradient(135deg, var(--mint), var(--teal));
+  display:flex;align-items:center;justify-content:center;
+  font-size:32px;flex-shrink:0;
+  border:3px solid rgba(255,255,255,0.2);
+}
+.about-name{font-size:22px;font-weight:700;font-family:'Ubuntu',sans-serif;}
+.about-title{font-size:12px;color:rgba(255,255,255,0.7);letter-spacing:1px;margin-top:3px;}
+.about-badges{display:flex;gap:8px;margin-top:8px;}
+.about-badge{
+  font-size:10px;padding:3px 10px;border-radius:20px;
+  background:rgba(255,255,255,0.15);letter-spacing:0.5px;
+}
+.about-body{padding:24px;}
+.about-bio{
+  font-size:14px;line-height:1.8;color:var(--text-mid);
+  margin-bottom:20px;
+}
+.about-stats{display:flex;gap:16px;flex-wrap:wrap;}
+.stat-card{
+  flex:1;min-width:100px;padding:12px 16px;
+  background:linear-gradient(135deg, rgba(135,196,74,0.1), rgba(46,184,184,0.05));
+  border:1px solid rgba(135,196,74,0.2);border-radius:8px;text-align:center;
+}
+.stat-num{font-size:22px;font-weight:700;color:var(--mint-dark);font-family:'Ubuntu Mono',monospace;}
+.stat-label{font-size:10px;color:var(--text-mid);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+
+/* Projects */
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;padding:20px;}
+.project-card{
+  border-radius:10px;overflow:hidden;
+  border:1px solid rgba(135,196,74,0.2);
+  background:white;
+  transition:transform 0.2s, box-shadow 0.2s;cursor:pointer;
+}
+.project-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.15);}
+.proj-header{
+  height:80px;display:flex;align-items:center;justify-content:center;
+  font-size:32px;
+}
+.proj-body{padding:12px 14px;}
+.proj-name{font-size:13px;font-weight:700;color:var(--text-dark);}
+.proj-desc{font-size:11px;color:var(--text-mid);margin-top:4px;line-height:1.5;}
+.proj-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+.proj-tag{
+  font-size:9px;padding:2px 8px;border-radius:20px;
+  background:rgba(135,196,74,0.12);color:var(--mint-dark);
+  letter-spacing:0.5px;font-weight:500;
+}
+
+/* Skills */
+.skills-section{padding:20px 24px;}
+.skills-category{margin-bottom:22px;}
+.skills-cat-title{
+  font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--mint-dark);margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.skills-cat-title::after{content:'';flex:1;height:1px;background:rgba(135,196,74,0.2);}
+.skill-item{margin-bottom:10px;}
+.skill-header{display:flex;justify-content:space-between;margin-bottom:5px;}
+.skill-name{font-size:12px;color:var(--text-dark);font-weight:500;}
+.skill-pct{font-size:11px;color:var(--mint-dark);font-family:'Ubuntu Mono',monospace;}
+.skill-bar{height:6px;background:rgba(135,196,74,0.15);border-radius:3px;overflow:hidden;}
+.skill-fill{
+  height:100%;border-radius:3px;
+  background:linear-gradient(90deg, var(--mint), var(--teal));
+  width:0%;transition:width 1s cubic-bezier(0.4,0,0.2,1);
+}
+.skill-tags-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.skill-tag{
+  padding:5px 14px;border-radius:20px;font-size:11px;
+  background:rgba(135,196,74,0.1);
+  border:1px solid rgba(135,196,74,0.25);
+  color:var(--text-dark);cursor:default;
+  transition:background 0.2s;
+}
+.skill-tag:hover{background:rgba(135,196,74,0.25);}
+
+/* Resume */
+.resume-wrap{padding:24px;}
+.resume-doc{
+  background:white;border:1px solid rgba(0,0,0,0.1);
+  border-radius:8px;padding:28px;
+  box-shadow:0 2px 12px rgba(0,0,0,0.08);
+}
+.resume-header{border-bottom:2px solid var(--mint);padding-bottom:14px;margin-bottom:18px;}
+.resume-name{font-size:22px;font-weight:700;color:var(--text-dark);}
+.resume-contact{font-size:11px;color:var(--text-mid);margin-top:4px;letter-spacing:0.5px;}
+.resume-section{margin-bottom:18px;}
+.resume-sec-title{
+  font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--mint-dark);border-left:3px solid var(--mint);
+  padding-left:8px;margin-bottom:10px;
+}
+.resume-item{margin-bottom:10px;}
+.resume-item-title{font-size:13px;font-weight:600;color:var(--text-dark);}
+.resume-item-sub{font-size:11px;color:var(--text-mid);margin-top:2px;}
+.resume-item-desc{font-size:11px;color:#555;margin-top:4px;line-height:1.6;}
+
+/* Contact */
+.contact-wrap{padding:24px;}
+.contact-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.contact-card{
+  padding:16px;border-radius:10px;
+  background:linear-gradient(135deg,rgba(135,196,74,0.08),rgba(46,184,184,0.05));
+  border:1px solid rgba(135,196,74,0.2);
+  display:flex;align-items:center;gap:12px;cursor:pointer;
+  transition:transform 0.2s, box-shadow 0.2s;
+}
+.contact-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.1);}
+.contact-icon{font-size:24px;}
+.contact-label{font-size:11px;color:var(--text-mid);text-transform:uppercase;letter-spacing:1px;}
+.contact-value{font-size:13px;color:var(--text-dark);font-weight:500;margin-top:2px;}
+.contact-form{margin-top:4px;}
+.cf-row{margin-bottom:12px;}
+.cf-label{font-size:11px;color:var(--text-mid);letter-spacing:0.5px;margin-bottom:4px;display:block;}
+.cf-input,.cf-textarea{
+  width:100%;padding:9px 12px;border-radius:6px;
+  border:1px solid rgba(135,196,74,0.3);
+  background:white;font-family:'Ubuntu',sans-serif;font-size:13px;
+  color:var(--text-dark);outline:none;
+  transition:border-color 0.2s,box-shadow 0.2s;
+  user-select:text;
+}
+.cf-input:focus,.cf-textarea:focus{border-color:var(--mint);box-shadow:0 0 0 3px rgba(135,196,74,0.15);}
+.cf-textarea{height:80px;resize:vertical;}
+.cf-submit{
+  width:100%;padding:10px;border:none;border-radius:6px;
+  background:linear-gradient(135deg,var(--mint),var(--mint-dark));
+  color:white;font-family:'Ubuntu',sans-serif;font-size:13px;
+  font-weight:600;cursor:pointer;letter-spacing:0.5px;
+  transition:opacity 0.2s,transform 0.2s;
+}
+.cf-submit:hover{opacity:0.9;transform:translateY(-1px);}
+
+/* Blog */
+.blog-list{padding:16px;}
+.blog-post{
+  padding:16px;margin-bottom:12px;border-radius:10px;
+  background:white;border:1px solid rgba(135,196,74,0.15);
+  cursor:pointer;transition:transform 0.2s, box-shadow 0.2s;
+}
+.blog-post:hover{transform:translateX(4px);box-shadow:0 4px 16px rgba(0,0,0,0.08);}
+.blog-tag{
+  display:inline-block;font-size:9px;padding:2px 8px;
+  border-radius:20px;background:rgba(135,196,74,0.12);
+  color:var(--mint-dark);letter-spacing:1px;margin-bottom:6px;text-transform:uppercase;
+}
+.blog-title{font-size:14px;font-weight:600;color:var(--text-dark);}
+.blog-meta{font-size:11px;color:var(--text-mid);margin-top:4px;}
+.blog-excerpt{font-size:12px;color:#555;margin-top:6px;line-height:1.6;}
+
+/* CV Download */
+.cv-download-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;height:100%;padding:40px;text-align:center;gap:20px;
+}
+.cv-icon-big{font-size:64px;}
+.cv-title{font-size:18px;font-weight:700;color:var(--text-dark);}
+.cv-sub{font-size:13px;color:var(--text-mid);line-height:1.6;}
+.cv-btn{
+  padding:12px 32px;border-radius:8px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--mint),var(--mint-dark));
+  color:white;font-size:14px;font-weight:600;
+  letter-spacing:0.5px;transition:opacity 0.2s,transform 0.2s;
+  font-family:'Ubuntu',sans-serif;
+}
+.cv-btn:hover{opacity:0.9;transform:translateY(-2px);}
+.cv-updated{font-size:11px;color:var(--text-mid);letter-spacing:0.5px;}
+
+/* ── RIGHT-CLICK MENU ── */
+#ctx-menu{
+  position:fixed;z-index:9999;
+  background:rgba(25,35,18,0.97);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(135,196,74,0.25);
+  border-radius:8px;padding:5px 0;
+  min-width:180px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.4);
+  display:none;
+}
+.ctx-item{
+  padding:8px 16px;font-size:12px;color:rgba(255,255,255,0.8);
+  cursor:pointer;display:flex;align-items:center;gap:10px;
+  transition:background 0.1s;
+}
+.ctx-item:hover{background:rgba(135,196,74,0.15);color:white;}
+.ctx-sep{height:1px;background:rgba(135,196,74,0.15);margin:4px 0;}
+
+/* ── SHUTDOWN OVERLAY ── */
+#shutdown-overlay{
+  position:fixed;inset:0;z-index:9998;
+  background:black;opacity:0;pointer-events:none;
+  transition:opacity 1s ease;
+  display:flex;align-items:center;justify-content:center;
+}
+#shutdown-overlay.active{opacity:1;pointer-events:all;}
+.shutdown-text{
+  font-family:'Ubuntu Mono',monospace;color:rgba(255,255,255,0.3);
+  font-size:13px;letter-spacing:2px;
+}
+
+/* ── TASKBAR WINDOW LABELS ── */
+#taskbar-apps{
+  position:absolute;bottom:0;left:62px;right:0;height:32px;
+  background:rgba(20,30,15,0.85);backdrop-filter:blur(8px);
+  border-top:1px solid rgba(135,196,74,0.12);
+  display:flex;align-items:center;padding:0 12px;gap:6px;
+  z-index:90;
+}
+.taskbar-btn{
+  height:22px;padding:0 12px;border-radius:4px;
+  background:rgba(135,196,74,0.12);border:1px solid rgba(135,196,74,0.2);
+  color:rgba(255,255,255,0.75);font-size:11px;cursor:pointer;
+  display:flex;align-items:center;gap:6px;
+  transition:background 0.15s;font-family:'Ubuntu',sans-serif;
+  white-space:nowrap;
+}
+.taskbar-btn:hover{background:rgba(135,196,74,0.22);}
+.taskbar-btn.active-win{background:rgba(135,196,74,0.28);border-color:rgba(135,196,74,0.4);}
+</style>
+</head>
+<body>
+<div id="desktop">
+
+  <!-- TOP PANEL -->
+  <div id="top-panel">
+    <div class="panel-left">
+      <div class="panel-logo">
+        <div class="panel-logo-dot"></div>
+        ZAIDI OS
+      </div>
+      <span class="panel-menu-item">Files</span>
+      <span class="panel-menu-item">Tools</span>
+      <span class="panel-menu-item">View</span>
+    </div>
+    <div class="panel-right">
+      <!-- Wifi -->
+      <div class="panel-indicator">
+        <svg viewBox="0 0 24 24"><path d="M1 9l2 2c5-5 13-5 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+      </div>
+      <!-- Battery -->
+      <div class="panel-indicator">
+        <div class="panel-battery-bar"><div class="panel-battery-fill" id="bat-fill" style="width:72%"></div></div>
+        <span id="bat-text">72%</span>
+      </div>
+      <!-- Clock -->
+      <div id="panel-clock">--:-- --</div>
+    </div>
+  </div>
+
+  <!-- LEFT DOCK -->
+  <div id="dock">
+    <div class="dock-icon" onclick="openWindow('about')" id="dock-about">
+      <span>👤</span>
+      <div class="dock-tooltip">About Me</div>
+      <div class="dock-dot"></div>
+    </div>
+    <div class="dock-icon" onclick="openWindow('projects')" id="dock-projects">
+      <span>📁</span>
+      <div class="dock-tooltip">Projects</div>
+      <div class="dock-dot"></div>
+    </div>
+    <div class="dock-icon" onclick="openWindow('skills')" id="dock-skills">
+      <span>⚡</span>
+      <div class="dock-tooltip">Skills</div>
+      <div class="dock-dot"></div>
+    </div>
+    <div class="dock-icon" onclick="openWindow('resume')" id="dock-resume">
+      <span>📄</span>
+      <div class="dock-tooltip">Resume/CV</div>
+      <div class="dock-dot"></div>
+    </div>
+    <div class="dock-sep"></div>
+    <div class="dock-icon" onclick="openWindow('blog')" id="dock-blog">
+      <span>✍️</span>
+      <div class="dock-tooltip">Blog</div>
+      <div class="dock-dot"></div>
+    </div>
+    <div class="dock-icon" onclick="openWindow('contact')" id="dock-contact">
+      <span>📬</span>
+      <div class="dock-tooltip">Contact</div>
+      <div class="dock-dot"></div>
+    </div>
+    <div class="dock-spacer"></div>
+    <div class="dock-shutdown" onclick="doShutdown()">
+      <span>⏻</span>
+      <div class="dock-tooltip">Shutdown</div>
+    </div>
+  </div>
+
+  <!-- DESKTOP AREA -->
+  <div id="desktop-area">
+
+    <!-- Desktop Icons -->
+    <div id="desktop-icons">
+      <div class="desktop-icon" ondblclick="openWindow('about')">
+        <div class="di-emoji">👤</div>
+        <div class="di-label">About Me</div>
+      </div>
+      <div class="desktop-icon" ondblclick="openWindow('projects')">
+        <div class="di-emoji">📁</div>
+        <div class="di-label">Projects</div>
+      </div>
+      <div class="desktop-icon" ondblclick="openWindow('skills')">
+        <div class="di-emoji">⚡</div>
+        <div class="di-label">Skills</div>
+      </div>
+      <div class="desktop-icon" ondblclick="openWindow('resume')">
+        <div class="di-emoji">📄</div>
+        <div class="di-label">Resume/CV</div>
+      </div>
+      <div class="desktop-icon" ondblclick="openWindow('cv')">
+        <div class="di-emoji">⬇️</div>
+        <div class="di-label">CV Download</div>
+      </div>
+      <div class="desktop-icon" ondblclick="openWindow('blog')">
+        <div class="di-emoji">✍️</div>
+        <div class="di-label">Blog</div>
+      </div>
+      <div class="desktop-icon" ondblclick="openWindow('contact')">
+        <div class="di-emoji">📬</div>
+        <div class="di-label">Contact</div>
+      </div>
+    </div>
+
+    <!-- Windows render here -->
+
+  </div>
+
+  <!-- TASKBAR -->
+  <div id="taskbar-apps"></div>
+
+</div>
+
+<!-- RIGHT CLICK MENU -->
+<div id="ctx-menu">
+  <div class="ctx-item" onclick="ctxAction('refresh')">🔄&nbsp; Refresh Desktop</div>
+  <div class="ctx-item" onclick="ctxAction('sort')">📋&nbsp; Sort Icons</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="ctxAction('theme')">🎨&nbsp; Change Wallpaper</div>
+  <div class="ctx-item" onclick="ctxAction('about-sys')">⚙️&nbsp; About This System</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="doShutdown()">⏻&nbsp; Shutdown...</div>
+</div>
+
+<!-- SHUTDOWN OVERLAY -->
+<div id="shutdown-overlay">
+  <div class="shutdown-text">Shutting down ZAIDI OS...</div>
+</div>
+
+<script>
+// ═══════════════════════════════
+// AUDIO — Classic window open sound (Web Audio API)
+// ═══════════════════════════════
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+
+function playWindowSound(){
+  try{
+    if(!audioCtx) audioCtx = new AudioCtx();
+    // Classic XP-style ding: two tones
+    const notes = [
+      {freq:880, time:0,    dur:0.08, vol:0.3},
+      {freq:1320,time:0.07, dur:0.12, vol:0.25},
+      {freq:1760,time:0.16, dur:0.18, vol:0.2},
+    ];
+    notes.forEach(n=>{
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(n.freq, audioCtx.currentTime + n.time);
+      gain.gain.setValueAtTime(0, audioCtx.currentTime + n.time);
+      gain.gain.linearRampToValueAtTime(n.vol, audioCtx.currentTime + n.time + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + n.time + n.dur);
+      osc.start(audioCtx.currentTime + n.time);
+      osc.stop(audioCtx.currentTime + n.time + n.dur + 0.05);
+    });
+  }catch(e){}
+}
+
+// ═══════════════════════════════
+// CLOCK
+// ═══════════════════════════════
+function updateClock(){
+  const now = new Date();
+  let h = now.getHours(), m = now.getMinutes();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  const ms = String(m).padStart(2,'0');
+  document.getElementById('panel-clock').textContent = `${h}:${ms} ${ampm}`;
+}
+updateClock(); setInterval(updateClock, 1000);
+
+// Battery flicker
+let bat = 72;
+setInterval(()=>{
+  bat = Math.max(10, Math.min(100, bat + (Math.random()>0.5?1:-1)));
+  document.getElementById('bat-fill').style.width = bat+'%';
+  document.getElementById('bat-text').textContent = bat+'%';
+}, 8000);
+
+// ═══════════════════════════════
+// WINDOW SYSTEM
+// ═══════════════════════════════
+let zTop = 10;
+const openWindows = {};
+
+const winConfigs = {
+  about:   {title:'About Me — Zaidi Sama',      width:520, height:440, icon:'👤'},
+  projects:{title:'Projects',                    width:640, height:480, icon:'📁'},
+  skills:  {title:'Skills & Technologies',       width:500, height:500, icon:'⚡'},
+  resume:  {title:'Resume / CV',                 width:580, height:560, icon:'📄'},
+  cv:      {title:'Download CV',                 width:380, height:300, icon:'⬇️'},
+  blog:    {title:'Blog & Articles',             width:560, height:440, icon:'✍️'},
+  contact: {title:'Contact Me',                  width:520, height:500, icon:'📬'},
+};
+
+function openWindow(id){
+  // If already open, focus it
+  if(openWindows[id]){
+    const w = openWindows[id];
+    if(w.classList.contains('minimized')) w.classList.remove('minimized');
+    w.style.zIndex = ++zTop;
+    updateTaskbar();
+    return;
+  }
+
+  const cfg = winConfigs[id];
+  const area = document.getElementById('desktop-area');
+  const aW = area.clientWidth, aH = area.clientHeight - 32;
+
+  // Random offset so windows cascade
+  const count = Object.keys(openWindows).length;
+  const left = Math.min(80 + count*28, aW - cfg.width - 20);
+  const top  = Math.min(60 + count*28, aH - cfg.height - 20);
+
+  const win = document.createElement('div');
+  win.className = 'window opening';
+  win.id = 'win-'+id;
+  win.style.cssText = `left:${left}px;top:${top}px;width:${cfg.width}px;height:${cfg.height}px;z-index:${++zTop};`;
+
+  win.innerHTML = `
+    <div class="win-titlebar" onmousedown="startDrag(event,'${id}')">
+      <div class="win-controls">
+        <button class="win-btn win-close" onclick="closeWindow('${id}')" title="Close">✕</button>
+        <button class="win-btn win-min"   onclick="minimizeWindow('${id}')" title="Minimize">─</button>
+        <button class="win-btn win-max"   onclick="maximizeWindow('${id}')" title="Maximize">□</button>
+      </div>
+      <div class="win-title">${cfg.icon} ${cfg.title}</div>
+    </div>
+    <div class="win-body">${getWindowContent(id)}</div>
+    <div class="win-resize" onmousedown="startResize(event,'${id}')"></div>
+  `;
+
+  area.appendChild(win);
+  openWindows[id] = win;
+  playWindowSound();
+
+  // Mark dock icon active
+  const dockEl = document.getElementById('dock-'+id);
+  if(dockEl) dockEl.classList.add('active');
+
+  setTimeout(()=>win.classList.remove('opening'), 300);
+  animateSkillBars(id);
+  updateTaskbar();
+
+  win.addEventListener('mousedown',()=>{
+    win.style.zIndex = ++zTop;
+  });
+}
+
+function closeWindow(id){
+  const win = openWindows[id];
+  if(!win) return;
+  win.style.transition = 'transform 0.18s ease, opacity 0.18s ease';
+  win.style.transform = 'scale(0.88)';
+  win.style.opacity = '0';
+  setTimeout(()=>{
+    win.remove();
+    delete openWindows[id];
+    const dockEl = document.getElementById('dock-'+id);
+    if(dockEl) dockEl.classList.remove('active');
+    updateTaskbar();
+  }, 180);
+}
+
+function minimizeWindow(id){
+  const win = openWindows[id];
+  if(!win) return;
+  win.classList.add('minimized');
+  updateTaskbar();
+}
+
+let isMaximized = {};
+function maximizeWindow(id){
+  const win = openWindows[id];
+  if(!win) return;
+  if(isMaximized[id]){
+    win.classList.remove('maximized');
+    isMaximized[id] = false;
+  } else {
+    win.classList.add('maximized');
+    isMaximized[id] = true;
+  }
+}
+
+// ── DRAG ──
+let dragState = null;
+function startDrag(e, id){
+  if(e.target.classList.contains('win-btn')) return;
+  const win = openWindows[id];
+  win.style.zIndex = ++zTop;
+  dragState = {
+    id, win,
+    startX: e.clientX, startY: e.clientY,
+    origL: parseInt(win.style.left)||0,
+    origT: parseInt(win.style.top)||0
+  };
+  e.preventDefault();
+}
+document.addEventListener('mousemove', e => {
+  if(!dragState) return;
+  const dx = e.clientX - dragState.startX;
+  const dy = e.clientY - dragState.startY;
+  dragState.win.style.left = (dragState.origL + dx) + 'px';
+  dragState.win.style.top  = (dragState.origT + dy) + 'px';
+});
+document.addEventListener('mouseup', () => { dragState = null; });
+
+// ── RESIZE ──
+let resizeState = null;
+function startResize(e, id){
+  const win = openWindows[id];
+  resizeState = {
+    win,
+    startX: e.clientX, startY: e.clientY,
+    origW: win.offsetWidth, origH: win.offsetHeight
+  };
+  e.stopPropagation(); e.preventDefault();
+}
+document.addEventListener('mousemove', e => {
+  if(!resizeState) return;
+  const dw = e.clientX - resizeState.startX;
+  const dh = e.clientY - resizeState.startY;
+  resizeState.win.style.width  = Math.max(300, resizeState.origW + dw) + 'px';
+  resizeState.win.style.height = Math.max(180, resizeState.origH + dh) + 'px';
+});
+document.addEventListener('mouseup', () => { resizeState = null; });
+
+// ── TASKBAR ──
+function updateTaskbar(){
+  const bar = document.getElementById('taskbar-apps');
+  bar.innerHTML = '';
+  Object.keys(openWindows).forEach(id => {
+    const cfg = winConfigs[id];
+    const w = openWindows[id];
+    const btn = document.createElement('div');
+    btn.className = 'taskbar-btn' + (w.classList.contains('minimized')?'':' active-win');
+    btn.textContent = cfg.icon + ' ' + cfg.title.split('—')[0].trim().substring(0,18);
+    btn.onclick = () => {
+      if(w.classList.contains('minimized')){
+        w.classList.remove('minimized');
+        w.style.zIndex = ++zTop;
+      } else {
+        w.classList.add('minimized');
+      }
+      updateTaskbar();
+    };
+    bar.appendChild(btn);
+  });
+}
+
+// ── SKILL BARS ──
+function animateSkillBars(id){
+  if(id !== 'skills') return;
+  setTimeout(()=>{
+    document.querySelectorAll('.skill-fill').forEach(el => {
+      el.style.width = el.dataset.pct + '%';
+    });
+  }, 100);
+}
+
+// ═══════════════════════════════
+// WINDOW CONTENT
+// ═══════════════════════════════
+function getWindowContent(id){
+  switch(id){
+    case 'about': return contentAbout();
+    case 'projects': return contentProjects();
+    case 'skills': return contentSkills();
+    case 'resume': return contentResume();
+    case 'cv': return contentCV();
+    case 'blog': return contentBlog();
+    case 'contact': return contentContact();
+    default: return '<div class="content-pad">Content coming soon.</div>';
+  }
+}
+
+function contentAbout(){return`
+<div class="about-header">
+  <div class="about-avatar">🧑‍💻</div>
+  <div>
+    <div class="about-name">Zaidi Sama</div>
+    <div class="about-title">SYED TURAB HAIDER ZAIDI</div>
+    <div class="about-badges">
+      <span class="about-badge">&lt; Full Stack Dev /&gt;</span>
+      <span class="about-badge">[ Pentester ]</span>
+    </div>
+  </div>
+</div>
+<div class="about-body">
+  <div class="about-bio">
+    Final semester CS student at Superior University, Lahore. Self-taught developer and cybersecurity enthusiast with a non-traditional background — started in pre-medicine, pivoted to web development, and then deep-dived into offensive security.<br><br>
+    I build full-stack web applications with the MERN stack and actively hunt vulnerabilities through CTFs and Hack The Box labs. I believe in understanding systems deeply — both to build them and break them.
+  </div>
+  <div class="about-stats">
+    <div class="stat-card"><div class="stat-num">3+</div><div class="stat-label">Years Dev</div></div>
+    <div class="stat-card"><div class="stat-num">HTB</div><div class="stat-label">Active</div></div>
+    <div class="stat-card"><div class="stat-num">25%</div><div class="stat-label">CPTS Progress</div></div>
+    <div class="stat-card"><div class="stat-num">PKT</div><div class="stat-label">Lahore</div></div>
+  </div>
+</div>`;}
+
+function contentProjects(){return`
+<div class="projects-grid">
+  <div class="project-card">
+    <div class="proj-header" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9)">🚌</div>
+    <div class="proj-body">
+      <div class="proj-name">Bahifazat</div>
+      <div class="proj-desc">School transport safety PWA connecting parents with van drivers. Live GPS, SOS alerts, JazzCash payments.</div>
+      <div class="proj-tags"><span class="proj-tag">Next.js</span><span class="proj-tag">NestJS</span><span class="proj-tag">Socket.io</span><span class="proj-tag">PostgreSQL</span></div>
+    </div>
+  </div>
+  <div class="project-card">
+    <div class="proj-header" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb)">🔐</div>
+    <div class="proj-body">
+      <div class="proj-name">AI Payload Analyzer</div>
+      <div class="proj-desc">AI-powered tool for analyzing suspicious payloads and malware patterns. Work in progress.</div>
+      <div class="proj-tags"><span class="proj-tag">React</span><span class="proj-tag">Python</span><span class="proj-tag">AI/ML</span></div>
+    </div>
+  </div>
+  <div class="project-card">
+    <div class="proj-header" style="background:linear-gradient(135deg,#fce4ec,#f8bbd0)">📊</div>
+    <div class="proj-body">
+      <div class="proj-name">OSINT Dashboard</div>
+      <div class="proj-desc">Passive reconnaissance dashboard built for a journalist client. Aggregates data from multiple sources.</div>
+      <div class="proj-tags"><span class="proj-tag">Node.js</span><span class="proj-tag">OSINT</span><span class="proj-tag">MongoDB</span></div>
+    </div>
+  </div>
+  <div class="project-card">
+    <div class="proj-header" style="background:linear-gradient(135deg,#f3e5f5,#e1bee7)">🌐</div>
+    <div class="proj-body">
+      <div class="proj-name">This Portfolio</div>
+      <div class="proj-desc">OS-simulation portfolio. Boot sequence, dual desktop environments, CMS backend.</div>
+      <div class="proj-tags"><span class="proj-tag">React</span><span class="proj-tag">Express</span><span class="proj-tag">MongoDB</span></div>
+    </div>
+  </div>
+</div>`;}
+
+function contentSkills(){return`
+<div class="skills-section">
+  <div class="skills-category">
+    <div class="skills-cat-title">Frontend</div>
+    ${skillBar('React / Next.js', 88)}
+    ${skillBar('HTML & CSS', 95)}
+    ${skillBar('JavaScript', 85)}
+    ${skillBar('Tailwind / Styled Components', 80)}
+  </div>
+  <div class="skills-category">
+    <div class="skills-cat-title">Backend</div>
+    ${skillBar('Node.js / Express', 82)}
+    ${skillBar('MongoDB / Mongoose', 78)}
+    ${skillBar('REST API Design', 84)}
+    ${skillBar('PostgreSQL / Supabase', 70)}
+  </div>
+  <div class="skills-category">
+    <div class="skills-cat-title">Cybersecurity</div>
+    ${skillBar('Metasploit / msfconsole', 75)}
+    ${skillBar('Nmap / Reconnaissance', 80)}
+    ${skillBar('Burp Suite', 65)}
+    ${skillBar('OSINT & Passive Recon', 85)}
+  </div>
+  <div class="skills-category">
+    <div class="skills-cat-title">Tools & OS</div>
+    <div class="skill-tags-wrap">
+      ${['ParrotOS','Kali Linux','Git/GitHub','Gobuster','Hydra','Wireshark','spiderfoot','recon-ng','wifite','Figma','VS Code','Docker'].map(t=>`<span class="skill-tag">${t}</span>`).join('')}
+    </div>
+  </div>
+</div>`;}
+
+function skillBar(name, pct){return`
+<div class="skill-item">
+  <div class="skill-header">
+    <span class="skill-name">${name}</span>
+    <span class="skill-pct">${pct}%</span>
+  </div>
+  <div class="skill-bar"><div class="skill-fill" data-pct="${pct}"></div></div>
+</div>`;}
+
+function contentResume(){return`
+<div class="resume-wrap">
+  <div class="resume-doc">
+    <div class="resume-header">
+      <div class="resume-name">Syed Turab Haider Zaidi</div>
+      <div class="resume-contact">Lahore, Pakistan &nbsp;·&nbsp; github.com/zaidi-sama &nbsp;·&nbsp; Full Stack Dev & Pentester</div>
+    </div>
+    <div class="resume-section">
+      <div class="resume-sec-title">Education</div>
+      <div class="resume-item">
+        <div class="resume-item-title">Associate Degree — Computer Science</div>
+        <div class="resume-item-sub">Superior University, Lahore &nbsp;·&nbsp; 2023 – Present (Final Semester)</div>
+      </div>
+    </div>
+    <div class="resume-section">
+      <div class="resume-sec-title">Experience</div>
+      <div class="resume-item">
+        <div class="resume-item-title">Freelance OSINT Researcher</div>
+        <div class="resume-item-sub">Journalist Client &nbsp;·&nbsp; 2024</div>
+        <div class="resume-item-desc">Conducted passive reconnaissance and open-source intelligence gathering for investigative journalism. Delivered structured reports using spiderfoot and recon-ng.</div>
+      </div>
+      <div class="resume-item">
+        <div class="resume-item-title">Full Stack Developer — Bahifazat PWA</div>
+        <div class="resume-item-sub">Personal Project &nbsp;·&nbsp; 2024–Present</div>
+        <div class="resume-item-desc">Designed and building a school transport safety platform for Lahore using Next.js 15, NestJS, Socket.io, and Supabase with real-time GPS tracking.</div>
+      </div>
+    </div>
+    <div class="resume-section">
+      <div class="resume-sec-title">Certifications & Training</div>
+      <div class="resume-item">
+        <div class="resume-item-title">CPTS — Certified Penetration Testing Specialist</div>
+        <div class="resume-item-sub">Hack The Box Academy &nbsp;·&nbsp; In Progress (25%)</div>
+      </div>
+      <div class="resume-item">
+        <div class="resume-item-title">HTB Starting Point Machines</div>
+        <div class="resume-item-sub">Hack The Box &nbsp;·&nbsp; Completed</div>
+      </div>
+    </div>
+    <div class="resume-section">
+      <div class="resume-sec-title">Skills Summary</div>
+      <div class="resume-item-desc">React · Next.js · Node.js · Express · MongoDB · PostgreSQL · Nmap · Metasploit · Burp Suite · OSINT · Git · ParrotOS · Kali Linux</div>
+    </div>
+  </div>
+</div>`;}
+
+function contentCV(){return`
+<div class="cv-download-wrap">
+  <div class="cv-icon-big">📄</div>
+  <div class="cv-title">Zaidi Sama — CV</div>
+  <div class="cv-sub">Download the latest version of my resume.<br>Includes projects, skills, and contact info.</div>
+  <button class="cv-btn" onclick="alert('CV download will be wired to your real file!')">⬇️ &nbsp;Download CV (PDF)</button>
+  <div class="cv-updated">Last updated: March 2025</div>
+</div>`;}
+
+function contentBlog(){return`
+<div class="blog-list">
+  <div class="blog-post">
+    <span class="blog-tag">HTB Writeup</span>
+    <div class="blog-title">Nibbles Machine — Nibbleblog File Upload RCE</div>
+    <div class="blog-meta">March 2025 &nbsp;·&nbsp; 8 min read</div>
+    <div class="blog-excerpt">Full walkthrough of exploiting the Nibbles HTB machine via a file upload vulnerability in Nibbleblog, pivoting from Metasploit to manual PHP webshell.</div>
+  </div>
+  <div class="blog-post">
+    <span class="blog-tag">Dev</span>
+    <div class="blog-title">Building a Real-Time GPS Tracking PWA in Lahore</div>
+    <div class="blog-meta">February 2025 &nbsp;·&nbsp; 12 min read</div>
+    <div class="blog-excerpt">Architecture decisions behind Bahifazat — how I chose NestJS + Socket.io for real-time location sharing and JazzCash for payments.</div>
+  </div>
+  <div class="blog-post">
+    <span class="blog-tag">OSINT</span>
+    <div class="blog-title">Passive Reconnaissance for Journalists — What I Learned</div>
+    <div class="blog-meta">January 2025 &nbsp;·&nbsp; 6 min read</div>
+    <div class="blog-excerpt">Working with a journalist client on passive OSINT taught me more about real-world intelligence than any lab. Here's what changed in my methodology.</div>
+  </div>
+  <div class="blog-post">
+    <span class="blog-tag">Security</span>
+    <div class="blog-title">From Pre-Med to Pentester — My Unconventional Path</div>
+    <div class="blog-meta">December 2024 &nbsp;·&nbsp; 5 min read</div>
+    <div class="blog-excerpt">Why I dropped pre-medicine, taught myself web dev, and ended up obsessing over breaking systems instead of building them.</div>
+  </div>
+</div>`;}
+
+function contentContact(){return`
+<div class="contact-wrap">
+  <div class="contact-cards">
+    <div class="contact-card" onclick="copyText('zaidi.sama@email.com')">
+      <div class="contact-icon">📧</div>
+      <div><div class="contact-label">Email</div><div class="contact-value">zaidi.sama@email.com</div></div>
+    </div>
+    <div class="contact-card" onclick="window.open('https://github.com','_blank')">
+      <div class="contact-icon">🐙</div>
+      <div><div class="contact-label">GitHub</div><div class="contact-value">github.com/zaidi-sama</div></div>
+    </div>
+    <div class="contact-card" onclick="window.open('https://linkedin.com','_blank')">
+      <div class="contact-icon">💼</div>
+      <div><div class="contact-label">LinkedIn</div><div class="contact-value">Zaidi Sama</div></div>
+    </div>
+    <div class="contact-card">
+      <div class="contact-icon">📍</div>
+      <div><div class="contact-label">Location</div><div class="contact-value">Lahore, Pakistan</div></div>
+    </div>
+  </div>
+  <div class="contact-form">
+    <div class="cf-row"><label class="cf-label">Your Name</label><input class="cf-input" placeholder="John Doe"/></div>
+    <div class="cf-row"><label class="cf-label">Email</label><input class="cf-input" placeholder="john@example.com"/></div>
+    <div class="cf-row"><label class="cf-label">Message</label><textarea class="cf-textarea" placeholder="Hello Zaidi, I'd like to..."></textarea></div>
+    <button class="cf-submit" onclick="alert('Message sent! (Connect to your API to make this real)')">Send Message 🚀</button>
+  </div>
+</div>`;}
+
+function copyText(t){
+  navigator.clipboard.writeText(t).then(()=>alert('Copied: '+t)).catch(()=>{});
+}
+
+// ═══════════════════════════════
+// RIGHT CLICK MENU
+// ═══════════════════════════════
+const ctxMenu = document.getElementById('ctx-menu');
+document.getElementById('desktop-area').addEventListener('contextmenu', e=>{
+  e.preventDefault();
+  ctxMenu.style.display='block';
+  let x = e.clientX, y = e.clientY;
+  if(x + 200 > window.innerWidth) x = window.innerWidth - 205;
+  if(y + 200 > window.innerHeight) y = window.innerHeight - 205;
+  ctxMenu.style.left = x+'px'; ctxMenu.style.top = y+'px';
+});
+document.addEventListener('click', ()=>{ ctxMenu.style.display='none'; });
+document.addEventListener('contextmenu', e=>{
+  if(!e.target.closest('#desktop-area')) ctxMenu.style.display='none';
+});
+
+function ctxAction(a){
+  ctxMenu.style.display='none';
+  if(a==='about-sys') openWindow('about');
+  else if(a==='refresh') location.reload();
+}
+
+// ═══════════════════════════════
+// SHUTDOWN
+// ═══════════════════════════════
+function doShutdown(){
+  const ov = document.getElementById('shutdown-overlay');
+  ov.classList.add('active');
+  setTimeout(()=>{
+    // In real app: window.location.href = '/boot'
+    window.location.href = 'boot.html';
+  }, 2000);
+}
+
+// ── Welcome: auto-open About on load ──
+setTimeout(()=>openWindow('about'), 600);
+</script>
+</body>
+</html>
