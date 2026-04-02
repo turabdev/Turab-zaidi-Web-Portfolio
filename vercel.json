@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "public": true,
   "buildCommand": "echo 'Static site'",
   "outputDirectory": ".",
   "routes": [
@@ -9,24 +8,19 @@
       "dest": "/admin.html"
     },
     {
-      "src": "/kali",
-      "dest": "/desktop-kali.html"
-    },
-    {
-      "src": "/mint",
-      "dest": "/mint-desktop.html"
-    },
-    {
       "src": "/webdev",
       "dest": "/desktop-webdev.html"
     },
     {
-      "src": "/boot",
+      "src": "/",
       "dest": "/Boot.html"
+<<<<<<< HEAD
     },
     {
       "src": "/(.*)",
       "dest": "/Boot.html"
+=======
+>>>>>>> 3ed1bb94d3c4183233da37a3b947315b279a99e4
     }
   ],
   "headers": [
