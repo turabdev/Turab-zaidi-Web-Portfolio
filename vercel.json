@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "public": true,
   "buildCommand": "echo 'Static site'",
   "outputDirectory": ".",
   "routes": [
@@ -9,23 +8,11 @@
       "dest": "/admin.html"
     },
     {
-      "src": "/(.*)",
-      "dest": "/desktop-kali.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/mint-desktop.html"
-    },
-    {
       "src": "/webdev",
       "dest": "/desktop-webdev.html"
     },
     {
-      "src": "/(.*)",
-      "dest": "/Boot.html"
-    },
-    {
-      "src": "/(.*)",
+      "src": "/",
       "dest": "/Boot.html"
     }
   ],
