@@ -9,11 +9,11 @@
       "dest": "/admin.html"
     },
     {
-      "src": "/kali",
+      "src": "/(.*)",
       "dest": "/desktop-kali.html"
     },
     {
-      "src": "/mint",
+      "src": "/(.*)",
       "dest": "/mint-desktop.html"
     },
     {
@@ -21,7 +21,7 @@
       "dest": "/desktop-webdev.html"
     },
     {
-      "src": "/boot",
+      "src": "/(.*)",
       "dest": "/Boot.html"
     },
     {
