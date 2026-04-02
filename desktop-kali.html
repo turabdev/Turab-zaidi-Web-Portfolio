@@ -498,9 +498,9 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--mono);}
       <span>📡</span><div class="dock-tooltip">Contact</div><div class="dock-dot"></div>
     </div>
     <div class="dock-spacer"></div>
-   <a href="./Boot.html"> <div class="dock-shutdown" onclick="doShutdown()">
+    <div class="dock-shutdown" onclick="doShutdown()">
       <span>⏻</span><div class="dock-tooltip">Shutdown</div>
-    </div></a>
+    </div>
   </div>
 
   <!-- DESKTOP AREA -->
@@ -1066,7 +1066,7 @@ function doShutdown(){
   const fill=document.getElementById('shutdown-fill');
   ov.classList.add('active');
   fill.style.width='100%';
-  setTimeout(()=>{window.location.href='boot.html';},2000);
+  setTimeout(()=>{window.location.href='Boot.html';},2000);
 }
 
 // Auto open about on load
