@@ -26,7 +26,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/desktop-kali.html"
+      "dest": "/Boot.html"
     }
   ],
   "headers": [
