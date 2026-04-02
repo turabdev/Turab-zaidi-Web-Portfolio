@@ -1,0 +1,18 @@
+{
+  "name": "turab-zaidi-portfolio",
+  "version": "1.0.0",
+  "description": "Interactive portfolio desktop - Pentester & Web Developer",
+  "main": "desktop-kali.html",
+  "scripts": {
+    "start": "npx http-server",
+    "build": "echo 'Static site - no build needed'"
+  },
+  "keywords": [
+    "portfolio",
+    "pentester",
+    "web-developer",
+    "cybersecurity"
+  ],
+  "author": "Turab Zaidi",
+  "license": "MIT"
+}

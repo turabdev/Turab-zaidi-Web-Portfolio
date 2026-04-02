@@ -1,0 +1,43 @@
+{
+  "version": 2,
+  "public": true,
+  "buildCommand": "echo 'Static site'",
+  "outputDirectory": ".",
+  "routes": [
+    {
+      "src": "/admin",
+      "dest": "/admin.html"
+    },
+    {
+      "src": "/kali",
+      "dest": "/desktop-kali.html"
+    },
+    {
+      "src": "/mint",
+      "dest": "/mint-desktop.html"
+    },
+    {
+      "src": "/webdev",
+      "dest": "/desktop-webdev.html"
+    },
+    {
+      "src": "/boot",
+      "dest": "/Boot.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/desktop-kali.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    }
+  ]
+}

